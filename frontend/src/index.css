@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "proxima-nova", "Source Sans Pro", sans-serif;
+  background: url('/images/5.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 90%;
+  font-weight: normal;
+}
+
+body a {
+  transition: 0.5s all;
+  -webkit-transition: 0.5s all;
+  -moz-transition: 0.5s all;
+  -o-transition: 0.5s all;
+  -ms-transition: 0.5s all;
+}
