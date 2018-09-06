@@ -16,13 +16,13 @@ class LoginPage extends React.Component {
   userForm = (e) => {
     const that = this;
     e.preventDefault();
-    axios.post('http://localhost:8080/api/login', {
+    axios.post('http://localhost:8080/user/login', {
       email: this.refs.email.value,
       password: this.refs.password.value
     })
     .then(function (response) {
-      if(response.data.success){
-        sessionStorage.setItem('username', response.data.username);
+      if(response.data.state === 1){
+        sessionStorage.setItem('username', response.data.email);
         sessionStorage.setItem('loggedIn', response.data.success);
         that.logSuccess();
       }
@@ -43,7 +43,7 @@ class LoginPage extends React.Component {
               </div>
             </div>
             <div className="model-body model-spa">
-              <div class="login-form">
+              <div className="login-form">
                 <form onSubmit={ this.userForm }>
                   <input type="email" ref="email" id="email"  placeholder="Email address" required autoFocus />
                   <input type="password"  ref="password" placeholder="Password" required />
@@ -52,11 +52,11 @@ class LoginPage extends React.Component {
                       <label className="checkbox">
                         <input type="checkbox" name="checkbox" className="mt-2"/>Remember me </label>
                     </span>
-                    <a className="forgot" href="#">Forgot Password?</a>
+                    <a className="forgot" href="# ">Forgot Password?</a>
                   </div>
                   <input type="submit" value="Login"/>
                 </form>
-                <p><a href="">Create a New Account</a></p>
+                <p><a href="/signup">Create a New Account</a></p>
                 <div className="social-icons agile">
                   <ul>
                     <li>

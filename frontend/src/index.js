@@ -6,6 +6,7 @@ import { configStore } from './store';
 import App from './pages/App';
 //import Main from './pages/App/components/Main';
 import Login from './pages/Auth/Login';
+import Signup from './pages/Auth/Signup';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -27,6 +28,7 @@ ReactDOM.render(
           : (<Route component={Login} />)
         )} />
         <Route path="/login" component={Login}/>
+        <Route path="/signup" component={Signup}/>
       </Switch>
     </Router>
 	</Provider>,
