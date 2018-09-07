@@ -7,6 +7,7 @@ import App from './pages/App';
 //import Main from './pages/App/components/Main';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
+import Verify from './pages/Auth/Verify';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -29,6 +30,7 @@ ReactDOM.render(
         )} />
         <Route path="/login" component={Login}/>
         <Route path="/signup" component={Signup}/>
+        <Route path="/verify" component={Verify}/>
       </Switch>
     </Router>
 	</Provider>,
