@@ -4,12 +4,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Style.css';
 
+var email = sessionStorage.getItem('verifyemail');
+
 class VerifyPage extends React.Component {
   constructor(props){
     super(props);
     this.userForm = this.userForm.bind(this);
     this.logSuccess = this.logSuccess.bind(this);
-    sessionStorage.clear();
   };
   logSuccess(){
     this.props.history.push("/app");
@@ -18,12 +19,9 @@ class VerifyPage extends React.Component {
   userForm = (e) => {
     const that = this;
     e.preventDefault();
-    var email = sessionStorage.getItem('verifyemail');
-    console.log(email)
+   
     var key = this.refs.key.value;
-    axios.get(`http://localhost:8080/user/verify?id=${key}`,{
-      email: email
-    })
+    axios.get(`http://localhost:8080/user/verify?id=${key}&email=${email}`)
     .then(function (response) {
       if(response.data.state === 1){
         toast.success(response.data.message);
@@ -37,6 +35,19 @@ class VerifyPage extends React.Component {
   render() {
     return (
       <div className="container">
+      <div>
+          <ToastContainer 
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnVisibilityChange
+            draggable
+            pauseOnHover
+          />
+        </div>
         <div className="login mt-5">
           <div className="model-content model-info">
             <div className="model-header">

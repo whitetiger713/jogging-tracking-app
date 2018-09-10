@@ -9,7 +9,6 @@ class SignupPage extends React.Component {
     super(props);
     this.userForm = this.userForm.bind(this);
     this.logSuccess = this.logSuccess.bind(this);
-    sessionStorage.clear();
   };
   logSuccess(){
     this.props.history.push("/verify");
@@ -27,6 +26,7 @@ class SignupPage extends React.Component {
       .then(function (response) {
         if(response.data.state === 1){
           toast.success(response.data.message);
+          console.log(response.data.email);
           sessionStorage.setItem('verifyemail', response.data.email);
           that.logSuccess();
         }

@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
+import GLogin from './GLogin';
 import './Style.css';
+
 
 class LoginPage extends React.Component {
   constructor(props){
@@ -26,6 +28,17 @@ class LoginPage extends React.Component {
         sessionStorage.setItem('loggedIn', response.data.success);
         that.logSuccess();
       }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  google = () => {
+    axios.post('http://localhost:8080/user/google', {
+      email: "aaaaaaa"
+    })
+    .then(function (response) {
+      console.log(response);
     })
     .catch(function (error) {
       console.log(error);
@@ -70,9 +83,7 @@ class LoginPage extends React.Component {
                       </a>
                     </li>
                     <li>
-                      <a href="# " className="googleplus ">
-                        <img src="/images/gp.png " title="googleplus " alt="googleplus " />
-                      </a>
+                      <GLogin/>
                     </li>
                   </ul>
                 </div>
