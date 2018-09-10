@@ -3,6 +3,7 @@ var bcrypt = require('bcrypt');
 var https = require('https');
 var nodemailer = require('nodemailer');
 var crypto = require('crypto');
+var passport = require('passport')
 /*
 	Here we are configuring our SMTP Server details.
 	STMP is mail server which is responsible for sending and recieving email.
@@ -14,7 +15,7 @@ var smtpTransport = nodemailer.createTransport({
         pass: ""
     }
 });
-var rand,mailOptions,host,link, newUser;
+var rand,mailOptions,host,link;
 
 function getUsers(res) {
 	User.find(function (err, users) {
@@ -65,7 +66,7 @@ module.exports = function (app) {
 							// 		res.end("sent");
 							// 	}
 							// });
-							newUser = new User({
+							var newUser = new User({
 								name: req.body.name,
 								email: req.body.email,
 								password: req.body.password,
@@ -75,7 +76,7 @@ module.exports = function (app) {
 									res.send(err);
 								} else {
 									res.send({
-										'email': nreq.body.email,
+										'email': req.body.email,
 										'state': 1,
 										'message': "Your account has been successfully created!"
 									});
@@ -147,6 +148,7 @@ module.exports = function (app) {
 	});
 	//check user in login
 	app.post('/user/login', function (req, res) {
+		console.log(req.body.email);
 		User.findOne({
 			email: req.body.email,
 		}, function (err, result) {
@@ -177,12 +179,21 @@ module.exports = function (app) {
 			}
 		});
 	});
+	app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+    // the callback after google has authenticated the user
+    app.get('/auth/google/callback',
+            passport.authenticate('google', {
+                    successRedirect : '/profile',
+                    failureRedirect : '/'
+            }));
+
 	app.get('/user/verify',function(req,res){
 		if((req.protocol+"://"+req.get('host')) === ("http://"+host)){
-			if(req.query.id==rand){
-				console.log(req.body.email)
+			if(req.query.id === rand){
+				console.log(req.query.email)
 				User.updateOne({
-					email: req.body.email
+					email: req.query.email
 				}, {
 					activity: 1
 				}, function (err, result) {
@@ -210,6 +221,17 @@ module.exports = function (app) {
 			});
 		}
 	});
+	// app.get('/user/google', passport.authenticate('google'));
+	app.get('/user/google', function(req, res){
+		console.log(req.body.email);
+	});
+	app.get('/auth/callback/google', 
+			passport.authenticate('google', { failureRedirect: '/login' }),
+			function(req, res) {
+					// Successful authentication, redirect to your app.
+					res.redirect('/');
+			}
+	);
 	// application -------------------------------------------------------------
 	app.get('*', function (req, res) {
 		res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)

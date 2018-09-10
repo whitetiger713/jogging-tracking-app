@@ -16,7 +16,9 @@
     "method-override": "^2.3.10",
     "mongoose": "^4.10.8",
     "morgan": "^1.9.0",
-    "nodemailer": "^4.6.8"
+    "nodemailer": "^4.6.8",
+    "passport": "^0.4.0",
+    "social-login": "^0.2.8"
   },
   "devDependencies": {
     "nodemon": "^1.17.5"

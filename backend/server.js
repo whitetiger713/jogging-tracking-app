@@ -2,6 +2,8 @@
 var express = require('express');
 var app = express(); 						// create our app w/ express
 var mongoose = require('mongoose'); 				// mongoose for mongodb
+var mongoose = require('mongoose');
+
 var port = process.env.PORT || 8080; 				// set the port
 var database = require('./config/database'); 			// load the database config
 var morgan = require('morgan');
@@ -11,6 +13,7 @@ var methodOverride = require('method-override');
 var cors = require('cors');
 
 // configuration ===============================================================
+mongoose.Promise = require('bluebird');
 mongoose.connect(database.localUrl); 	// Connect to local MongoDB instance. A remoteUrl is also available (modulus.io)
 
 app.use(express.static('./public')); 		// set the static files location /public/img will be /img for users
