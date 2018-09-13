@@ -6,7 +6,7 @@ import './Style.css';
 
 var email = sessionStorage.getItem('verifyemail');
 
-class VerifyPage extends React.Component {
+class Verify extends React.Component {
   constructor(props){
     super(props);
     this.userForm = this.userForm.bind(this);
@@ -71,5 +71,5 @@ class VerifyPage extends React.Component {
     );
   }
 }
-export default VerifyPage;
+export default Verify;
 

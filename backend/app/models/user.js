@@ -16,7 +16,7 @@ var UserSchema = new Schema({
 		default: ''
 	},
 	activity: {
-		type: String,
+		type: Intl,
 		default: 0
 	}
 }, {

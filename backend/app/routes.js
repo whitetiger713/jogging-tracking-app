@@ -148,7 +148,6 @@ module.exports = function (app) {
 	});
 	//check user in login
 	app.post('/user/login', function (req, res) {
-		console.log(req.body.email);
 		User.findOne({
 			email: req.body.email,
 		}, function (err, result) {
@@ -164,10 +163,19 @@ module.exports = function (app) {
 				User.comparePassword(password, userpassword, function (err, isMatch) {
 					if (err) throw err;
 					if (isMatch) {
-						res.send({
-							'state': 1,
-							'message': "Successfully Login!"
-						});
+						if(result.activity === 1){
+							res.send({
+								'state': 1,
+								'message': "Successfully Login!"
+							});
+						}
+						else{
+							res.send({
+								'state': 0,
+								'message': "Please contact Admin!"
+							});
+						}
+						
 					} else {
 						res.send({
 							'state': 0,
@@ -179,19 +187,10 @@ module.exports = function (app) {
 			}
 		});
 	});
-	app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
-
-    // the callback after google has authenticated the user
-    app.get('/auth/google/callback',
-            passport.authenticate('google', {
-                    successRedirect : '/profile',
-                    failureRedirect : '/'
-            }));
 
 	app.get('/user/verify',function(req,res){
 		if((req.protocol+"://"+req.get('host')) === ("http://"+host)){
 			if(req.query.id === rand){
-				console.log(req.query.email)
 				User.updateOne({
 					email: req.query.email
 				}, {
@@ -222,16 +221,51 @@ module.exports = function (app) {
 		}
 	});
 	// app.get('/user/google', passport.authenticate('google'));
-	app.get('/user/google', function(req, res){
-		console.log(req.body.email);
-	});
-	app.get('/auth/callback/google', 
-			passport.authenticate('google', { failureRedirect: '/login' }),
-			function(req, res) {
-					// Successful authentication, redirect to your app.
-					res.redirect('/');
+	app.post('/user/google', function(req, res){
+		User.findOne({
+			email: req.body.googleId
+		}, function (err, result) {
+			if (!result) {
+				var newUser = new User({
+					name: req.body.googleId,
+					email: req.body.googleId,
+					password: req.body.id_token,
+					activity: 1
+				});
+				User.createUser(newUser, function (err, user) {		
+					if (err) {
+						res.send(err);
+					} else {
+						res.send({
+							'state': 1,
+							'message': "Your account has been successfully created!"
+						});
+					}
+				});
 			}
-	);
+			else{
+				var userpassword = result.password;
+				var password = req.body.id_token;
+				var email = req.body.googleId;
+				User.comparePassword(password, userpassword, function (err, isMatch) {
+					if (err) throw err;
+					if (isMatch) {
+						res.send({
+							'state': 1,
+							'message': "Successfully Login!"
+						});
+					} else {
+						res.send({
+							'state': 0,
+							'email' : email,
+							'message': "Password isn't correct!"
+						});
+					}
+				});
+			}
+		});
+	});
+
 	// application -------------------------------------------------------------
 	app.get('*', function (req, res) {
 		res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)

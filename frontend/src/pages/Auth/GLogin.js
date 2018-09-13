@@ -1,18 +1,37 @@
 import React from 'react';
+import axios from 'axios';
 import { GoogleLogin } from 'react-google-login-component';
 class GLogin extends React.Component{
 
-  constructor (props, context) {
-    super(props, context);
+  googlesucess = () => {
+    console.log(this.props.props);
+    this.props.state.history.push('/app');
+    window.location.reload();
   }
- 
   responseGoogle = (googleUser) => {
 
     var id_token = googleUser.getAuthResponse().id_token;
     var googleId = googleUser.getId();
-    console.log(googleUser);
-    console.log({ googleId });
-    console.log({accessToken: id_token});
+    var signedIn = googleUser.isSignedIn();
+    const that = this;
+    
+    if(signedIn && id_token !== '' && googleId!==''){
+
+      axios.post('http://localhost:8080/user/google', {
+        googleId: googleId,
+        id_token: id_token
+      })
+      .then(function (response) {
+        if(response.data.state === 1){
+          sessionStorage.setItem('loggedIn', response.data.state);
+          console.log(response)
+          that.googlesucess();
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
     //anything else you want to do(save to localStorage)...
   }
   render () {

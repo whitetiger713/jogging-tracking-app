@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Style.css';
 
-class SignupPage extends React.Component {
+class Signup extends React.Component {
   constructor(props){
     super(props);
     this.userForm = this.userForm.bind(this);
@@ -26,7 +26,6 @@ class SignupPage extends React.Component {
       .then(function (response) {
         if(response.data.state === 1){
           toast.success(response.data.message);
-          console.log(response.data.email);
           sessionStorage.setItem('verifyemail', response.data.email);
           that.logSuccess();
         }
@@ -114,5 +113,5 @@ class SignupPage extends React.Component {
     );
   }
 }
-export default SignupPage;
+export default Signup;
 

@@ -1,10 +1,11 @@
 import React from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import GLogin from './GLogin';
 import './Style.css';
 
-
-class LoginPage extends React.Component {
+class Login extends React.Component {
   constructor(props){
     super(props);
     this.userForm = this.userForm.bind(this);
@@ -12,6 +13,7 @@ class LoginPage extends React.Component {
     sessionStorage.clear();
   };
   logSuccess(){
+    console.log(this.props);
     this.props.history.push("/app");
     window.location.reload();
   }
@@ -25,20 +27,12 @@ class LoginPage extends React.Component {
     .then(function (response) {
       if(response.data.state === 1){
         sessionStorage.setItem('username', response.data.email);
-        sessionStorage.setItem('loggedIn', response.data.success);
+        sessionStorage.setItem('loggedIn', response.data.state);
         that.logSuccess();
       }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  }
-  google = () => {
-    axios.post('http://localhost:8080/user/google', {
-      email: "aaaaaaa"
-    })
-    .then(function (response) {
-      console.log(response);
+      if(response.data.state === 0){
+        toast.error(response.data.message);
+      }
     })
     .catch(function (error) {
       console.log(error);
@@ -47,6 +41,19 @@ class LoginPage extends React.Component {
   render() {
     return (
       <div className="container">
+      <div>
+          <ToastContainer 
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnVisibilityChange
+            draggable
+            pauseOnHover
+          />
+        </div>
         <div className="login mt-5">
           <div className="model-content model-info">
             <div className="model-header">
@@ -83,7 +90,7 @@ class LoginPage extends React.Component {
                       </a>
                     </li>
                     <li>
-                      <GLogin/>
+                      <GLogin state = { this.props }/>
                     </li>
                   </ul>
                 </div>
@@ -95,5 +102,5 @@ class LoginPage extends React.Component {
     );
   }
 }
-export default LoginPage;
+export default Login;
 
