@@ -4,35 +4,28 @@ import { GoogleLogin } from 'react-google-login-component';
 class GLogin extends React.Component{
 
   googlesucess = () => {
-    console.log(this.props.props);
     this.props.state.history.push('/app');
     window.location.reload();
   }
-  responseGoogle = (googleUser) => {
-
-    var id_token = googleUser.getAuthResponse().id_token;
-    var googleId = googleUser.getId();
-    var signedIn = googleUser.isSignedIn();
+  responseGoogle = (response) => {
+    const tokenBlob = new Blob([JSON.stringify({access_token: response.getAuthResponse().access_token}, null, 2)], {type : 'application/json'});
+    const options = {
+        method: 'POST',
+        body: tokenBlob,
+        mode: 'cors',
+        cache: 'default'
+    };
     const that = this;
-    
-    if(signedIn && id_token !== '' && googleId!==''){
-
-      axios.post('http://localhost:8080/user/google', {
-        googleId: googleId,
-        id_token: id_token
-      })
-      .then(function (response) {
-        if(response.data.state === 1){
-          sessionStorage.setItem('loggedIn', response.data.state);
-          console.log(response)
-          that.googlesucess();
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    }
-    //anything else you want to do(save to localStorage)...
+    fetch('http://localhost:8080/user/google', options).then(r => {
+        const token = r.headers.get('x-auth-token');
+        console.log(token)
+        r.json().then(user => {
+            if (token) {
+              sessionStorage.setItem('loggedIn', token);
+              that.googlesucess();
+            }
+        });
+    })
   }
   render () {
     return (
@@ -52,5 +45,4 @@ class GLogin extends React.Component{
   }
  
  }
- 
  export default GLogin;
