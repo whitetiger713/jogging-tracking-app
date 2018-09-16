@@ -7,11 +7,19 @@ var UserSchema = new Schema({
 		type: String,
 		default: ''
 	},
+	provider: {
+		type:String,
+		default: ''
+	},
 	email: {
 		type: String,
 		default: ''
 	},
 	password: {
+		type: String,
+		default: ''
+	},
+	picture: {
 		type: String,
 		default: ''
 	},
