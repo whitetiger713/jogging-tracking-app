@@ -95,7 +95,7 @@ module.exports = function (app) {
 								name: req.body.name,
 								email: req.body.email,
 								password: req.body.password,
-								picutre: picture
+								picture: picture
 							});
 							User.createUser(newUser, function (err, user) {		
 								if (err) {
@@ -219,7 +219,6 @@ module.exports = function (app) {
 		let imageFile = req.files.file;
 		console.log(req.body.email)
 		var filename =  crypto.randomBytes(15).toString('hex');
-		// console.log(`${__dirname}/../public/user_images/${req.body.filename}.jpg`);
 		imageFile.mv(`${__dirname}/../public/user_images/${filename}.jpg`, function(err) {
 			if (err) {
 				return res.status(500).send(err);
@@ -286,7 +285,7 @@ module.exports = function (app) {
 	}, generateToken, sendToken);
 	
 	app.get('/user/usersearch', function(req,res){
-		var userdata
+		console.log("rrrrrrr----", req.query)
 		User.findOne({
 			email: req.query.key
 		}, function (err, user) {
@@ -307,17 +306,43 @@ module.exports = function (app) {
 						});
 					}
 				})
-				// var data = { 'fullname' : result.name,
-				// 						 'picture' : result.picture,
-				// 						 'provider' : result.provider,
-				// 						 'email' : result.email
-			  //           }
 			}
 			else {
 				console.log(err);
 			}
 		});
 	});
+	app.post('/user/usersearch', function(req,res){
+		console.log("aaaaa-----",req.body)
+		User.findOne({
+			email: req.body.email
+		}, function (err, user) {
+			if (user) {
+				Jogging.find({
+					email_id: user._id,
+					startdate: { $gte: req.body.from },
+					enddate: { $lte: req.body.to }
+				}, function (err, jogging) {
+					if (jogging) {
+						res.send({
+							user: user,
+							jogging: jogging
+						});
+					} 
+					else {
+						res.send({
+							user: user,
+							jogging: ''
+						});
+					}
+				})
+			}
+			else {
+				console.log(err);
+			}
+		});
+	});
+	
 	app.post('/jogging/add', function (req, res) {
 		var data = req.body.joggingdata;
 		console.log(data)
@@ -358,8 +383,25 @@ module.exports = function (app) {
 			}
 		});
 	});
-
-
+	app.post('/jogging/delete', function (req, res) {
+		console.log(req.body.id)
+		Jogging.remove({
+			_id: req.body.id
+		}, function (err, user) {
+			if (!user){
+				res.send({
+					'state': 0,
+					'message': "Error"
+				});
+			}
+			else {
+				res.send({
+					'state': 1,
+					'message': "Successfully Deleted"
+				});
+			}
+		})
+	});
 	// application -------------------------------------------------------------
 	app.get('*', function (req, res) {
 		res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
