@@ -1,8 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import Avatar from 'react-avatar-edit';
-import { Button } from 'reactstrap';
-import FileUpload from './FileUpload';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Style.css';
@@ -64,68 +61,69 @@ class Signup extends React.Component {
   }
   render() {
     return (
-      <div className="container">
-        <div>
-          <ToastContainer 
-            position="top-right"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnVisibilityChange
-            draggable
-            pauseOnHover
-          />
-        </div>
-        <div className="signup mt-5">
-          <div className="model-content model-info">
-            <div className="model-header">
-              <h2>SignUp</h2>
-              <div className="lo-im">
-                <FileUpload />
-                <img src="/images/avatar_2x.png" className="user-image" title=" user " alt="user" />
+      <div className="background">
+        <div className="container">
+          <div>
+            <ToastContainer 
+              position="top-right"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnVisibilityChange
+              draggable
+              pauseOnHover
+            />
+          </div>
+          <div className="signup pt-5">
+            <div className="model-content model-info">
+              <div className="model-header">
+                <h2>SignUp</h2>
+                <div className="lo-im">
+                  <img src="/images/avatar_2x.png" className="user-image" title=" user " alt="user" />
+                </div>
               </div>
-            </div>
-            <div className="model-body model-spa">
-              <div className="login-form">
-                <form onSubmit={ this.userForm } id="signup">
-                  <ol>
-                    <li>
-                      <input type="text" ref="name"  placeholder="Full name" required/>
-                    </li>
-                    <li>
-                      <input type="email" id="email" ref="email" placeholder="Mail@example.com" title="Please enter a valid email" required/>
-                    </li>
-                    <li>
-                      <input type="password" className="lock" ref="password1" title="Minimum 8 characters, one number, one uppercase and one lowercase letter"
-                        pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*" placeholder="Password" required/>
-                    </li>
-                    <li>
-                      <input type="password" ref="password2" className="lock" placeholder="Confirm Password" required/>
-                    </li>
-                  </ol>
-                  <input type="submit" value="Sign Up"/>
-                </form>
-                <p><a href = "/login"> Login Account</a></p>
-                <div className="social-icons agile">
-                  <ul>
-                    <li>
-                      <a href="# " className="facebook ">
-                        <img src="/images/fb.png " title="facebook " alt="facebook " />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="# " className="twitter ">
-                        <img src="/images/tw.png " title="twitter " alt="twitter " />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="# " className="googleplus ">
-                        <img src="/images/gp.png " title="googleplus " alt="googleplus " />
-                      </a>
-                    </li>
-                  </ul>
+              <div className="model-body model-spa">
+                <div className="login-form">
+                  <form onSubmit={ this.userForm } id="signup">
+                    <ol>
+                      <li>
+                        <input type="text" ref="name"  placeholder="Full name" required/>
+                      </li>
+                      <li>
+                        <input type="email" id="email" ref="email" placeholder="Mail@example.com" title="Please enter a valid email" required/>
+                      </li>
+                      <li>
+                        <input type="password" className="lock" ref="password1" title="Minimum 8 characters, one number, one uppercase and one lowercase letter"
+                          pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*" placeholder="Password" required/>
+                      </li>
+                      <li>
+                        <input type="password" ref="password2" className="lock" placeholder="Confirm Password" required/>
+                      </li>
+                    </ol>
+                    <input type="submit" value="Sign Up"/>
+                  </form>
+                  <p><a href = "/login"> Login Account</a></p>
+                  <div className="social-icons agile">
+                    <ul>
+                      <li>
+                        <a href="# " className="facebook ">
+                          <img src="/images/fb.png " title="facebook " alt="facebook " />
+                        </a>
+                      </li>
+                      <li>
+                        <a href="# " className="twitter ">
+                          <img src="/images/tw.png " title="twitter " alt="twitter " />
+                        </a>
+                      </li>
+                      <li>
+                        <a href="# " className="googleplus ">
+                          <img src="/images/gp.png " title="googleplus " alt="googleplus " />
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>

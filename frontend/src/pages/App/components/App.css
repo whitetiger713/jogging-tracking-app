@@ -1,7 +1,10 @@
 .App {
   text-align: center;
-  margin-top:30px auto;
   background-color: #fff;
+}
+.shadow-box{
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  padding-top: 50px;
 }
 
 .App-logo {
@@ -31,8 +34,11 @@
 .font-25{
   font-size: 25px;
 }
-.font-18{
-  font-size: 18px;
+.font-40{
+  font-size: 40px;
+}
+.font-20{
+  font-size: 20px;
 }
 .main-container{
   margin: 50px auto;
@@ -41,10 +47,55 @@
 .font-white{
   color: beige;
 }
+.font-bule{
+  color: #00f;
+}
 .ml-20{
   margin-left: 20px;
 }
 .content{
     margin: 5px auto;
     width:600px;
+}
+.avatar-image {
+  border-radius: 50%;
+  width: 100%;
+}
+.profile-pic {
+	position: relative;
+	display: inline-block;
+}
+
+.profile-pic:hover .edit {
+	display: block;
+}
+
+.edit {
+  color: #37A000;
+	padding-right: 7px;
+	position: absolute;
+	right: 0;
+	top: 0;
+  display: none;
+  /*  -webkit-box-shadow: 0 1px 10px rgba(57,73,76,0.35);  */
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  /* padding-top: 50px; */
+}
+.btn-circle { 
+  margin: 15px 15px 0 0; 
+  border-radius: 50%; 
+  padding: 8px 10px 8px 10px;
+}
+label{
+  padding: 10px;
+  display: table;
+}
+input[type="file"] {
+  display: none;
+}
+.i{
+  color: #37A000;
+}
+.modal-dialog1{
+  max-width: 600px !important;
 }

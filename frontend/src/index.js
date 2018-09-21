@@ -10,11 +10,11 @@ import Signup from './pages/Auth/Signup';
 import Verify from './pages/Auth/Verify';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import 'font-awesome/css/font-awesome.min.css'; 
 import registerServiceWorker from './registerServiceWorker';
 
 const store = configStore();
-const loggedIn = sessionStorage.getItem('loggedIn');
+const loggedIn = JSON.parse(sessionStorage.getItem('userdata'));
 
 ReactDOM.render(
 	<Provider store={store}>

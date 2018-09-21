@@ -1,11 +1,13 @@
 
 #signup ol {
   list-style-type: none;
-  padding: 0;
+  padding-top: 0;
   margin: 0;
 }
 .background{
-  background-color: #fff;
+  text-align: center;
+  height: 100vh;
+  background: url('/images/5.jpg') no-repeat center center fixed;
 }
 #signup li {
   position: relative;

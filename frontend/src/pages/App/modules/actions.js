@@ -11,10 +11,11 @@ export const searchStart = () => {
   };
 };
 
-export const searchSuccess = (userdata) => {
+export const searchSuccess = (userdata,jogging) => {
   return {
     type: SEARCH_SUCCESS,
-    payload: userdata,
+    userdata: userdata,
+    jogging: jogging,
   };
 };
 
@@ -24,9 +25,9 @@ export const searchError = (errors) => {
     errors,
   };
 };
-export const usersearch = (keyword) => {
+export const usersearch = (email) => {
   return {
     type: FETCH_REQUEST,
-    keyword,
+    email,
   };
 };

@@ -1,8 +1,6 @@
 import React from 'react';
-import axios from 'axios';
 import { GoogleLogin } from 'react-google-login-component';
 class GLogin extends React.Component{
-
   googlesucess = () => {
     this.props.state.history.push('/app');
     window.location.reload();
@@ -17,11 +15,12 @@ class GLogin extends React.Component{
     };
     const that = this;
     fetch('http://localhost:8080/user/google', options).then(r => {
-        const token = r.headers.get('x-auth-token');
-        console.log(token)
+        const data = JSON.parse(r.headers.get('x-auth-token'));
+        console.log(data)
         r.json().then(user => {
-            if (token) {
-              sessionStorage.setItem('loggedIn', token);
+            if (data) { 
+              var userdata = {'loggedIn': data.token, 'email': data.email}
+              sessionStorage.setItem('userdata', JSON.stringify(userdata));
               that.googlesucess();
             }
         });

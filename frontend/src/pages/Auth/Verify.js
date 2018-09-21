@@ -34,35 +34,37 @@ class Verify extends React.Component {
   }
   render() {
     return (
-      <div className="container">
-      <div>
-          <ToastContainer 
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnVisibilityChange
-            draggable
-            pauseOnHover
-          />
-        </div>
-        <div className="login mt-5">
-          <div className="model-content model-info">
-            <div className="model-header">
-              <h2>Email Verify</h2>
-              <div className="lo-im">
-                <img src="/images/avatar_2x.png" className="user-image" title=" user " alt="user" />
+      <div className="background">
+        <div className="container">
+        <div>
+            <ToastContainer 
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnVisibilityChange
+              draggable
+              pauseOnHover
+            />
+          </div>
+          <div className="login mt-5">
+            <div className="model-content model-info">
+              <div className="model-header">
+                <h2>Email Verify</h2>
+                <div className="lo-im">
+                  <img src="/images/avatar_2x.png" className="user-image" title=" user " alt="user" />
+                </div>
               </div>
-            </div>
-            <div className="model-body model-spa">
-              <div className="login-form">
-                <form onSubmit={ this.userForm }>
-                  <input type="text" ref="key"  placeholder="TokenKey" required autoFocus />
-                  <input type="submit" value="Send Email"/>
-                </form>
-                <p><a href="/login">Login</a></p>
+              <div className="model-body model-spa">
+                <div className="login-form">
+                  <form onSubmit={ this.userForm }>
+                    <input type="text" ref="key"  placeholder="TokenKey" required autoFocus />
+                    <input type="submit" value="Send Email"/>
+                  </form>
+                  <p><a href="/login">Login</a></p>
+                </div>
               </div>
             </div>
           </div>

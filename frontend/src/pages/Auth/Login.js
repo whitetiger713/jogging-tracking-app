@@ -13,7 +13,6 @@ class Login extends React.Component {
     sessionStorage.clear();
   };
   logSuccess(){
-    console.log(this.props);
     this.props.history.push("/app");
     window.location.reload();
   }
@@ -26,8 +25,8 @@ class Login extends React.Component {
     })
     .then(function (response) {
       if(response.data.state === 1){
-        sessionStorage.setItem('username', response.data.email);
-        sessionStorage.setItem('loggedIn', response.data.state);
+        var userdata = {'email' : response.data.email, 'loggedIn': response.data.state}
+        sessionStorage.setItem('userdata', JSON.stringify(userdata));
         that.logSuccess();
       }
       if(response.data.state === 0){
@@ -40,59 +39,61 @@ class Login extends React.Component {
   }
   render() {
     return (
-      <div className="container background">
-      <div>
-          <ToastContainer 
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnVisibilityChange
-            draggable
-            pauseOnHover
-          />
-        </div>
-        <div className="login mt-5">
-          <div className="model-content model-info">
-            <div className="model-header">
-              <h2>Login</h2>
-              <div className="lo-im">
-                <img src="/images/avatar_2x.png" className="user-image" title=" user " alt="user" />
+      <div className="background">
+        <div className="container">
+          <div>
+            <ToastContainer 
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnVisibilityChange
+              draggable
+              pauseOnHover
+            />
+          </div>
+          <div className="login pt-5">
+            <div className="model-content model-info">
+              <div className="model-header">
+                <h2>Login</h2>
+                <div className="lo-im">
+                  <img src="/images/avatar_2x.png" className="user-image" title=" user " alt="user" />
+                </div>
               </div>
-            </div>
-            <div className="model-body model-spa">
-              <div className="login-form">
-                <form onSubmit={ this.userForm }>
-                  <input type="email" ref="email" id="email"  placeholder="Email address" required autoFocus />
-                  <input type="password"  ref="password" placeholder="Password" required />
-                  <div className="signin-rit">
-                    <span className="checkbox1">
-                      <label className="checkbox">
-                        <input type="checkbox" name="checkbox" className="mt-2"/>Remember me </label>
-                    </span>
-                    <a className="forgot" href="# ">Forgot Password?</a>
+              <div className="model-body model-spa">
+                <div className="login-form">
+                  <form onSubmit={ this.userForm }>
+                    <input type="email" ref="email" id="email"  placeholder="Email address" required autoFocus />
+                    <input type="password"  ref="password" placeholder="Password" required />
+                    <div className="signin-rit">
+                      <span className="checkbox1">
+                        <label className="checkbox">
+                          <input type="checkbox" name="checkbox" className="mt-2"/>Remember me </label>
+                      </span>
+                      <a className="forgot" href="# ">Forgot Password?</a>
+                    </div>
+                    <input type="submit" value="Login"/>
+                  </form>
+                  <p><a href="/signup">Create a New Account</a></p>
+                  <div className="social-icons agile">
+                    <ul>
+                      <li>
+                        <a href="# " className="facebook ">
+                          <img src="/images/fb.png " title="facebook " alt="facebook " />
+                        </a>
+                      </li>
+                      <li>
+                        <a href="# " className="twitter ">
+                          <img src="/images/tw.png " title="twitter " alt="twitter " />
+                        </a>
+                      </li>
+                      <li>
+                        <GLogin state = { this.props }/>
+                      </li>
+                    </ul>
                   </div>
-                  <input type="submit" value="Login"/>
-                </form>
-                <p><a href="/signup">Create a New Account</a></p>
-                <div className="social-icons agile">
-                  <ul>
-                    <li>
-                      <a href="# " className="facebook ">
-                        <img src="/images/fb.png " title="facebook " alt="facebook " />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="# " className="twitter ">
-                        <img src="/images/tw.png " title="twitter " alt="twitter " />
-                      </a>
-                    </li>
-                    <li>
-                      <GLogin state = { this.props }/>
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>

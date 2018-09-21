@@ -15,7 +15,7 @@ const app = (state = initialState, action) => {
       return { ...state, loading: true };
 
     case SEARCH_SUCCESS:
-      return { ...state, loading: false, userdata: action.payload };
+      return { ...state, loading: false, userdata: action.userdata, jogging:action.jogging };
 
     case SEARCH_ERROR:
       return { ...state, loading: false, errors: action.errors };
