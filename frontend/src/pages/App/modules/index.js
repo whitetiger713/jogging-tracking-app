@@ -7,6 +7,7 @@ const initialState = {
   loading: false,
   userdata: null,
   errors: null,
+  jogging:null,
 };
 
 const app = (state = initialState, action) => {

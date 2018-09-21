@@ -31,3 +31,11 @@ export const usersearch = (email) => {
     email,
   };
 };
+export const jogging_search_filter = (email, from, to) => {
+  return {
+    type: FETCH_REQUEST,
+    email: email,
+    from: from,
+    to: to,
+  };
+};

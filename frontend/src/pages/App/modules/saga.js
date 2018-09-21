@@ -4,12 +4,33 @@ import { FETCH_REQUEST } from './index';
 import { searchStart , searchSuccess , searchError } from './actions';
 
 
-const getdataAPI = (email) => {
-  const userkey = email.email;
-  return axios.get(`http://localhost:8080/user/usersearch?key=${userkey}`);
-}
+const getdataAPI = ({email}) => {
+  const user = email;
+  if(!user.from){
+    return axios.get(`http://localhost:8080/user/usersearch?key=${user.email}`);
+  }
+  else {
+    return axios.post('http://localhost:8080/user/usersearch', {
+        email: user.email,
+        from: user.from,
+        to: user.to
+      })
+    }
+
+    // const userkey = email.email;
+    // console.log("bbbbbb-------", userkey)
+    // const from = email.from;
+    // const to = email.to;
+    // return axios.post('http://localhost:8080/user/usersearch', {
+    //         email: userkey,
+    //         from: from,
+    //         to: to
+    //       })
+    // }
+  }
 
 function* usersearch(email){
+ 
   try {
       yield put(searchStart()); 
       const respone = yield getdataAPI(email);

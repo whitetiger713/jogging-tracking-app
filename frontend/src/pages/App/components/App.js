@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Container, Input, Row, Table, Col, Card, Label, Button, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
-import SearchForm from './SearchForm';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import DateTimePicker from 'react-datetime-picker';
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css'
 import './App.css';
 const userInfo = JSON.parse(sessionStorage.getItem('userdata'));
 class App extends Component {
@@ -12,6 +13,7 @@ class App extends Component {
     super(props);
     this.usersearch = this.usersearch.bind(this);
     this.logout = this.logout.bind(this);
+    this.jogging_search_filter = this.jogging_search_filter.bind(this);
     this.state = {
       imgUpload: false,
       joggadd: false,
@@ -23,7 +25,7 @@ class App extends Component {
       jogging_view: false,
       jogging_view_id: '',
       jogging_update: false,
-      jogging_update_id: ''
+      jogging_update_id: '',
     };
 
     this.toggle = this.toggle.bind(this);
@@ -34,6 +36,8 @@ class App extends Component {
     this.jogging_update = this.jogging_update.bind(this);
     this.changeDistanceHandler = this.changeDistanceHandler.bind(this);
     this.changeCommitHandler = this.changeCommitHandler.bind(this);
+    this.jogging_filter = this.jogging_filter.bind(this);
+    
   }
   onChangeDate1 = startdate => this.setState({ startdate })
  
@@ -51,17 +55,19 @@ class App extends Component {
   }
   componentWillMount(){
     if(!userInfo){
-      // this.logout();
+      this.logout();
     }
     else{
-      this.props.usersearch(userInfo.email);
+      var email = {email: userInfo.email, from: "", to: ""}
+      this.props.usersearch(email);
     }
   }
   logout(){
     sessionStorage.clear();
     this.props.history.push("/login");
   }
-  usersearch({ email }) {
+  usersearch(email) {
+    console.log("email------")
     this.props.usersearch(email);
   }
   success_update(){
@@ -99,7 +105,7 @@ class App extends Component {
           "/" + datetime.getDate() + " ";
     var hours = datetime.getHours() < 10 ? "0"+datetime.getHours().toString() : datetime.getHours().toString();
     var minutes = datetime.getMinutes() < 10 ? "0"+datetime.getMinutes().toString() : datetime.getMinutes().toString();
-    newdate = newdate + hours + ":"+minutes;
+    newdate = newdate + hours + ":"+ minutes;
     return newdate;
   }
   handlejoggingSubmit = (ev) =>  {  
@@ -117,15 +123,6 @@ class App extends Component {
     else{
       var that = this;
       var diff_time =  Math.floor(end.getTime()-start.getTime())/1000/60/60;
-      
-      // var startdate = start.getFullYear().toString() + "/" + (start.getMonth() + 1).toString() +
-      //     "/" + start.getDate() + " " + start.getHours() +
-      //     ":" + start.getMinutes();
-      // var end = this.state.enddate;
-      // var enddate =end.getFullYear().toString() + "/" + (end.getMonth() + 1).toString() +
-      //       "/" + end.getDate() + " " + end.getHours() +
-      //       ":" + end.getMinutes();
-      // console.log(startdate,"------", enddate);
       var joggingdata = {
         "distance": this.state.distance,
         "startdate": this.state.startdate,
@@ -195,15 +192,6 @@ class App extends Component {
     else{
       var that = this;
       var diff_time =  Math.floor(end.getTime()-start.getTime())/1000/60/60;
-      console.log("aaaaaaa----", diff_time)
-      // var startdate = start.getFullYear().toString() + "/" + (start.getMonth() + 1).toString() +
-      //     "/" + start.getDate() + " " + start.getHours() +
-      //     ":" + start.getMinutes();
-      // var end = this.state.enddate;
-      // var enddate =end.getFullYear().toString() + "/" + (end.getMonth() + 1).toString() +
-      //       "/" + end.getDate() + " " + end.getHours() +
-      //       ":" + end.getMinutes();
-      // console.log(startdate,"------", enddate);
       var joggingdata = {
         "id": this.state.jogging_update_id,
         "distance": this.state.distance,
@@ -233,9 +221,64 @@ class App extends Component {
       });
     }    
   }
-  
+  jogging_delete_set(id){
+    var that = this;
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className='custom-ui shadow-box p-4'>
+            <h5>Confirm Alert</h5>
+            <h2 >You want to delete this data?</h2>
+            <div className="mt-4 text-right">
+              <Button size="sm" onClick={onClose} className="mr-2">No</Button>
+              <Button color="primary" size="sm" onClick={() => {
+                axios.post('http://localhost:8080/jogging/delete', {
+                  id
+                })
+                .then(function (response) {
+                  if(response.data.state === 1){
+                    toast.success(response.data.message);
+                    that.jogging_update();
+                    setTimeout(function () {
+                      that.success_update();
+                    }, 1000);
+                  }
+                  if(response.data.state === 0){
+                    toast.error(response.data.message);
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+                onClose()
+              }}>Yes</Button>
+            </div>
+          </div>
+        )
+      }
+    })
+  }
+  jogging_search_filter(email,from,to){
+    console.log(this.props)
+    // this.props.jogging_search_filter(email, from, to)
+  }
+  jogging_filter(){
+
+    var email_id = this.props.userdata._id;
+    var startdate = this.state.startdate;
+    var enddate = this.state.enddate;
+    if(startdate && enddate && startdate >= enddate){
+      toast.error("Please check startDate and endDate!!");
+      return;
+    }
+    else{
+      var that = this;
+      var email = {email: userInfo.email, from: startdate, to: enddate}
+      this.usersearch(email);
+    }
+  }
   render(){
-    const { loading, userdata, jogging, errors} = this.props;
+    const { userdata, jogging} = this.props;
     console.log(this.state.jogging_update_id)
     return (
       <div className="App">
@@ -305,13 +348,17 @@ class App extends Component {
             <Row>
               <Col sm="12">
                 <Label className="font-40 font-bule">Jogging Data</Label>
-                
               </Col>
             </Row>
             <Row className="mr-1 ml-1">
               <Col sm="12">
+                <Label className="font-20">From</Label>
+                <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="enddate"/>
+                <Label className="font-20">To</Label>
+                <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
+                <Button color="success" className="ml-3" onClick={this.jogging_filter}>Filter</Button>
                 <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.toggle_joggadd}>
-                  <i className="fa fa-plus" aria-hidden="true"></i>
+                  <i className="fa fa-plus" title="Add"></i>
                 </Button>
               </Col>
               <Col sm="12">
@@ -339,7 +386,7 @@ class App extends Component {
                           <td width="15%">{Math.round(url.distance/url.diff_time)}</td>
                           <td width="7%"><i className="fa fa-eye fa-lg i" onClick={() => {this.jogging_view_set(url._id)}}></i></td>
                           <td width="7%"><i className="fa fa-pencil-square-o fa-lg i" onClick={() => {this.jogging_update_set(url._id, url)}}></i></td>
-                          <td width="7%"><i className="fa fa-trash fa-lg i"></i></td>
+                          <td width="7%"><i className="fa fa-trash fa-lg i" onClick={() => {this.jogging_delete_set(url._id)}}></i></td>
                         </tr>
                       );
                     })}
