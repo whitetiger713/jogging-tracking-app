@@ -13,7 +13,6 @@ class App extends Component {
     super(props);
     this.usersearch = this.usersearch.bind(this);
     this.logout = this.logout.bind(this);
-    this.jogging_search_filter = this.jogging_search_filter.bind(this);
     this.state = {
       imgUpload: false,
       joggadd: false,
@@ -67,7 +66,6 @@ class App extends Component {
     this.props.history.push("/login");
   }
   usersearch(email) {
-    console.log("email------")
     this.props.usersearch(email);
   }
   success_update(){
@@ -226,7 +224,7 @@ class App extends Component {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
-          <div className='custom-ui shadow-box p-4'>
+          <div className='custom-ui shadow-box p-4 mt-5'>
             <h5>Confirm Alert</h5>
             <h2 >You want to delete this data?</h2>
             <div className="mt-4 text-right">
@@ -258,10 +256,6 @@ class App extends Component {
       }
     })
   }
-  jogging_search_filter(email,from,to){
-    console.log(this.props)
-    // this.props.jogging_search_filter(email, from, to)
-  }
   jogging_filter(){
 
     var email_id = this.props.userdata._id;
@@ -279,7 +273,6 @@ class App extends Component {
   }
   render(){
     const { userdata, jogging} = this.props;
-    console.log(this.state.jogging_update_id)
     return (
       <div className="App">
         <div>

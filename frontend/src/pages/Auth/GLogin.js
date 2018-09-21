@@ -16,7 +16,6 @@ class GLogin extends React.Component{
     const that = this;
     fetch('http://localhost:8080/user/google', options).then(r => {
         const data = JSON.parse(r.headers.get('x-auth-token'));
-        console.log(data)
         r.json().then(user => {
             if (data) { 
               var userdata = {'loggedIn': data.token, 'email': data.email}

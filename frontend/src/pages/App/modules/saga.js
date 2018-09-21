@@ -16,17 +16,6 @@ const getdataAPI = ({email}) => {
         to: user.to
       })
     }
-
-    // const userkey = email.email;
-    // console.log("bbbbbb-------", userkey)
-    // const from = email.from;
-    // const to = email.to;
-    // return axios.post('http://localhost:8080/user/usersearch', {
-    //         email: userkey,
-    //         from: from,
-    //         to: to
-    //       })
-    // }
   }
 
 function* usersearch(email){
