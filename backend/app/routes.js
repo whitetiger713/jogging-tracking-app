@@ -23,7 +23,6 @@ passport.use(new GoogleTokenStrategy({
 	clientSecret: config.googleAuth.clientSecret
 	},
 	function (accessToken, refreshToken, profile, done) {
-			// console.log(profile);
 			var email = profile.id;
 			var provider = profile.provider;
 			var name = profile.displayName;
@@ -217,7 +216,6 @@ module.exports = function (app) {
 
 	app.post('/user/fileupload', (req, res, next) => {
 		let imageFile = req.files.file;
-		console.log(req.body.email)
 		var filename =  crypto.randomBytes(15).toString('hex');
 		imageFile.mv(`${__dirname}/../public/user_images/${filename}.jpg`, function(err) {
 			if (err) {
@@ -285,7 +283,6 @@ module.exports = function (app) {
 	}, generateToken, sendToken);
 	
 	app.get('/user/usersearch', function(req,res){
-		console.log("rrrrrrr----", req.query)
 		User.findOne({
 			email: req.query.key
 		}, function (err, user) {
@@ -313,7 +310,6 @@ module.exports = function (app) {
 		});
 	});
 	app.post('/user/usersearch', function(req,res){
-		console.log("aaaaa-----",req.body)
 		User.findOne({
 			email: req.body.email
 		}, function (err, user) {
@@ -345,7 +341,6 @@ module.exports = function (app) {
 	
 	app.post('/jogging/add', function (req, res) {
 		var data = req.body.joggingdata;
-		console.log(data)
 		var jogging = new Jogging(data);
 		jogging.save(function(user){
 			if (!user) {
@@ -384,7 +379,6 @@ module.exports = function (app) {
 		});
 	});
 	app.post('/jogging/delete', function (req, res) {
-		console.log(req.body.id)
 		Jogging.remove({
 			_id: req.body.id
 		}, function (err, user) {
