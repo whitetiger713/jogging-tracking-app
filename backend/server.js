@@ -34,7 +34,7 @@ var corsOption = {
   exposedHeaders: ['x-auth-token']
 };
 app.use(cors(corsOption));
-
+app.use(cors());
 app.use(fileUpload());
 // routes ======================================================================
 require('./app/routes.js')(app);

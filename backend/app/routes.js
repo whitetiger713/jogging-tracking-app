@@ -1,11 +1,9 @@
 var User = require('./models/user');
+var Jogging = require('./models/jogging');
 var bcrypt = require('bcrypt');
 var https = require('https');
-// var nodemailer = require('nodemailer');
 var crypto = require('crypto');
-var axios = require('axios');
 var passport = require('passport');
-// var {OAuth2Client} = require('google-auth-library');
 var { generateToken, sendToken } = require('./utils/token.utils');
 var config = require('../config/auth');
 // var smtpTransport = nodemailer.createTransport({
@@ -15,7 +13,7 @@ var config = require('../config/auth');
 //         pass: ""
 //     }
 // });
-
+// https://nodemailer.com/about/
 var rand,mailOptions,host,link;
 
 var GoogleTokenStrategy = require('passport-google-token').Strategy;
@@ -54,22 +52,7 @@ passport.use(new GoogleTokenStrategy({
 ));
 
 module.exports = function (app) {
-	// 	app.use(function(req, res, next) {
-	// 	const err = new Error('Not Found');
-	// 	err.status = 404;
-	// 	next(err);
-	// });
 	
-	// // error handler
-	// app.use(function(err, req, res, next) {
-	// 	// set locals, only providing error in development
-	// 	res.locals.message = err.message;
-	// 	res.locals.error = req.app.get('env') === 'development' ? err : {};
-	
-	// 	// render the error page
-	// 	res.status(err.status || 500);
-	// 	res.render('error');
-	// });	
 	// register users
 	app.post('/user/register', function (req, res) {
 		User.findOne({
@@ -107,10 +90,12 @@ module.exports = function (app) {
 							// 		res.end("sent");
 							// 	}
 							// });
+							var picture = "http://localhost:8080/user_images/avatar.png"
 							var newUser = new User({
 								name: req.body.name,
 								email: req.body.email,
 								password: req.body.password,
+								picutre: picture
 							});
 							User.createUser(newUser, function (err, user) {		
 								if (err) {
@@ -187,21 +172,9 @@ module.exports = function (app) {
 			}
 		});
 	});
-
-	app.post('/user/fileupload', (req, res, next) => {
-		let imageFile = req.files.file;
-		console.log(`${__dirname}/../public/user_images/${req.body.filename}.jpg`);
-		imageFile.mv(`${__dirname}/../public/user_images/${req.body.filename}.jpg`, function(err) {
-			if (err) {
-				return res.status(500).send(err);
-			}
-			res.json({file: `user_images/${req.body.filename}.jpg`});
-		});
-	
-	});
-
 	//check user in login
 	app.post('/user/login', function (req, res) {
+		
 		User.findOne({
 			email: req.body.email,
 		}, function (err, result) {
@@ -220,6 +193,7 @@ module.exports = function (app) {
 						if(result.activity === 1){
 							res.send({
 								'state': 1,
+								'email': result.email,
 								'message': "Successfully Login!"
 							});
 						}
@@ -233,7 +207,6 @@ module.exports = function (app) {
 					} else {
 						res.send({
 							'state': 0,
-							'email' : email,
 							'message': "Password isn't correct!"
 						});
 					}
@@ -241,6 +214,32 @@ module.exports = function (app) {
 			}
 		});
 	});
+
+	app.post('/user/fileupload', (req, res, next) => {
+		let imageFile = req.files.file;
+		console.log(req.body.email)
+		var filename =  crypto.randomBytes(15).toString('hex');
+		// console.log(`${__dirname}/../public/user_images/${req.body.filename}.jpg`);
+		imageFile.mv(`${__dirname}/../public/user_images/${filename}.jpg`, function(err) {
+			if (err) {
+				return res.status(500).send(err);
+			}
+			User.updateOne({
+				email: req.body.email
+			}, {
+				picture: `http://localhost:8080/user_images/${filename}.jpg`
+			}, function (err, result) {
+				if (err) {
+					res.send(err);
+				}
+			});
+			res.json({file: `user_images/${filename}.jpg`});
+		});
+	
+	});
+
+	//check user in login
+	
 
 	app.get('/user/verify',function(req,res){
 		if((req.protocol+"://"+req.get('host')) === ("http://"+host)){
@@ -276,7 +275,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/user/google', passport.authenticate('google-token', {session: false}), function(req, res, next) {
-		console.log("qqqqqqqqqq")
+		
 		if (!req.user) {
 				return res.send(401, 'User Not Authenticated');
 		}
@@ -285,55 +284,82 @@ module.exports = function (app) {
 		};
 		next();
 	}, generateToken, sendToken);
-		// console.log(id_token);
-		// passport.authenticate(id_token), function (req, res) {
-		// 	// do something with req.user
-		// 	console.log(id_token);
-		// 	res.send(req.user? 200 : 401);
-		// }
-		// User.findOne({
-		// 	email: req.body.googleId
-		// }, function (err, result) {
-		// 	if (!result) {
-		// 		var newUser = new User({
-		// 			name: req.body.googleId,
-		// 			email: req.body.googleId,
-		// 			password: req.body.id_token,
-		// 			activity: 1
-		// 		});
-		// 		User.createUser(newUser, function (err, user) {		
-		// 			if (err) {
-		// 				res.send(err);
-		// 			} else {
-		// 				res.send({
-		// 					'state': 1,
-		// 					'message': "Your account has been successfully created!"
-		// 				});
-		// 			}
-		// 		});
-		// 	}
-		// 	else{
-		// 		var userpassword = result.password;
-		// 		var password = req.body.id_token;
-		// 		var email = req.body.googleId;
-		// 		User.comparePassword(password, userpassword, function (err, isMatch) {
-		// 			if (err) throw err;
-		// 			if (isMatch) {
-		// 				res.send({
-		// 					'state': 1,
-		// 					'message': "Successfully Login!"
-		// 				});
-		// 			} else {
-		// 				res.send({
-		// 					'state': 0,
-		// 					'email' : email,
-		// 					'message': "Password isn't correct!"
-		// 				});
-		// 			}
-		// 		});
-		// 	}
-		// });
 	
+	app.get('/user/usersearch', function(req,res){
+		var userdata
+		User.findOne({
+			email: req.query.key
+		}, function (err, user) {
+			if (user) {
+				Jogging.find({
+					email_id: user._id
+				}, function (err, jogging) {
+					if (jogging) {
+						res.send({
+							user: user,
+							jogging: jogging
+						});
+					} 
+					else {
+						res.send({
+							user: user,
+							jogging: ''
+						});
+					}
+				})
+				// var data = { 'fullname' : result.name,
+				// 						 'picture' : result.picture,
+				// 						 'provider' : result.provider,
+				// 						 'email' : result.email
+			  //           }
+			}
+			else {
+				console.log(err);
+			}
+		});
+	});
+	app.post('/jogging/add', function (req, res) {
+		var data = req.body.joggingdata;
+		console.log(data)
+		var jogging = new Jogging(data);
+		jogging.save(function(user){
+			if (!user) {
+				res.send({
+					'state': 1,
+					'message': "Successfully saved"
+				});
+			} 
+			else {
+				res.send({
+					'state': 0,
+					'message': "Error!"
+				});
+			}
+		});
+	});
+	app.post('/jogging/update', function (req, res) {
+		var data = req.body.joggingdata;
+		Jogging.updateOne({
+			_id: data.id,
+		}, {
+			distance: data.distance,
+			startdate: data.startdate,
+			enddate: data.enddate,
+			commit: data.commit,
+			diff_time: data.diff_time
+		}, function (err, result) {
+			if (!result) {
+				res.send(err);
+			} else {
+				res.send({
+					'state': 1,
+					'message': "Successfully updated"
+				});
+			}
+		});
+	});
+
+
 	// application -------------------------------------------------------------
 	app.get('*', function (req, res) {
 		res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)

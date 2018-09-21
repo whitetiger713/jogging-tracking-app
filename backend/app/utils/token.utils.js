@@ -10,13 +10,16 @@ var createToken = function(auth) {
 
 module.exports = {
   generateToken: function(req, res, next) {
-      console.log('2-----');
       req.token = createToken(req.auth);
       return next();
   },
   sendToken: function(req, res) {
-      console.log('3---', req.token, req.user);
-      res.setHeader('x-auth-token', req.token);
-      return res.status(200).send(JSON.stringify(req.user));
+    var data = {
+        'token': req.token,
+        'email': req.user.email
+    }
+
+    res.setHeader('x-auth-token', JSON.stringify(data));
+    return res.status(200).send(JSON.stringify(req.user));
   }
 };
