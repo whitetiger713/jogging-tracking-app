@@ -49,10 +49,17 @@ passport.use(new GoogleTokenStrategy({
 			});
 	}
 ));
+function getUsers() {
+	User.find(function (err, users) {
+			if (err) {
+				return err;
+			}
+			return users;
+	});
+};
 
 module.exports = function (app) {
-	
-	// register users
+		// register users
 	app.post('/user/register', function (req, res) {
 		User.findOne({
 			email: req.body.email
@@ -173,7 +180,6 @@ module.exports = function (app) {
 	});
 	//check user in login
 	app.post('/user/login', function (req, res) {
-		
 		User.findOne({
 			email: req.body.email,
 		}, function (err, result) {
@@ -237,7 +243,6 @@ module.exports = function (app) {
 
 	//check user in login
 	
-
 	app.get('/user/verify',function(req,res){
 		if((req.protocol+"://"+req.get('host')) === ("http://"+host)){
 			if(req.query.id === rand){
@@ -283,59 +288,77 @@ module.exports = function (app) {
 	}, generateToken, sendToken);
 	
 	app.get('/user/usersearch', function(req,res){
-		User.findOne({
-			email: req.query.key
-		}, function (err, user) {
-			if (user) {
-				Jogging.find({
-					email_id: user._id
-				}, function (err, jogging) {
-					if (jogging) {
-						res.send({
-							user: user,
-							jogging: jogging
-						});
-					} 
-					else {
-						res.send({
-							user: user,
-							jogging: ''
-						});
+		User.find(function (err, users) {
+			if (err) {
+				return err;
+			}
+			else{
+				User.findOne({
+					email: req.query.key
+				}, function (err, user) {
+					if (user) {
+						Jogging.find({
+							email_id: user._id
+						}, function (err, jogging) {
+							if (jogging) {
+								res.send({
+									user: user,
+									users: users,
+									jogging: jogging
+								});
+							} 
+							else {
+								res.send({
+									user: user,
+									jogging: '',
+									users: ''
+								});
+							}
+						})
 					}
-				})
-			}
-			else {
-				console.log(err);
-			}
+					else {
+						console.log(err);
+					}
+				});
+			};
 		});
 	});
 	app.post('/user/usersearch', function(req,res){
-		User.findOne({
-			email: req.body.email
-		}, function (err, user) {
-			if (user) {
-				Jogging.find({
-					email_id: user._id,
-					startdate: { $gte: req.body.from },
-					enddate: { $lte: req.body.to }
-				}, function (err, jogging) {
-					if (jogging) {
-						res.send({
-							user: user,
-							jogging: jogging
-						});
-					} 
-					else {
-						res.send({
-							user: user,
-							jogging: ''
-						});
+		User.find(function (err, users) {
+			if (err) {
+				return err;
+			}
+			else{
+				User.findOne({
+					email: req.body.email
+				}, function (err, user) {
+					if (user) {
+						Jogging.find({
+							email_id: user._id,
+							startdate: { $gte: req.body.from },
+							enddate: { $lte: req.body.to }
+						}, function (err, jogging) {
+							if (jogging) {
+								res.send({
+									user: user,
+									users: users,
+									jogging: jogging
+								});
+							} 
+							else {
+								res.send({
+									user: user,
+									jogging: '',
+									users: ''
+								});
+							}
+						})
 					}
-				})
-			}
-			else {
-				console.log(err);
-			}
+					else {
+						console.log(err);
+					}
+				});
+			};
 		});
 	});
 	

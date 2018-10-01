@@ -26,6 +26,10 @@ var UserSchema = new Schema({
 	activity: {
 		type: Intl,
 		default: 0
+	},
+	role: {
+		type: String,
+		default: ''
 	}
 }, {
 	timestamps: true
