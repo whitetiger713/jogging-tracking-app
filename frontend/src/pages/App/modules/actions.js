@@ -11,11 +11,12 @@ export const searchStart = () => {
   };
 };
 
-export const searchSuccess = (userdata,jogging) => {
+export const searchSuccess = (userdata,jogging,users) => {
   return {
     type: SEARCH_SUCCESS,
     userdata: userdata,
     jogging: jogging,
+    users: users,
   };
 };
 

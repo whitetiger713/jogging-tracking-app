@@ -257,8 +257,6 @@ class App extends Component {
     })
   }
   jogging_filter(){
-
-    var email_id = this.props.userdata._id;
     var startdate = this.state.startdate;
     var enddate = this.state.enddate;
     if(startdate && enddate && startdate >= enddate){
@@ -266,13 +264,12 @@ class App extends Component {
       return;
     }
     else{
-      var that = this;
       var email = {email: userInfo.email, from: startdate, to: enddate}
       this.usersearch(email);
     }
   }
   render(){
-    const { userdata, jogging} = this.props;
+    const { userdata, jogging, users} = this.props;
     return (
       <div className="App">
         <div>
@@ -299,10 +296,9 @@ class App extends Component {
               <Col sm="12">
                 <h1 >Jogging APP</h1>
               </Col>
-            
             </Row>
-            { userdata ? (
-              <Row className="pt-5">
+              { userdata &&
+                <Row className="pt-5">
                 <Col sm="6" lg="3" md={{ size: 4, offset: 2 }}>
                   <Card className="profile-pic p-2" >
                     <img src={ userdata.picture } className="avatar-image" alt="avatar"/>
@@ -337,166 +333,228 @@ class App extends Component {
                     </ModalBody>
                   </Modal>
                 </Row>
-              ) : (<Row></Row>)}
-            <Row>
-              <Col sm="12">
-                <Label className="font-40 font-bule">Jogging Data</Label>
-              </Col>
-            </Row>
-            <Row className="mr-1 ml-1">
-              <Col sm="12">
-                <Label className="font-20">From</Label>
-                <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="enddate"/>
-                <Label className="font-20">To</Label>
-                <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
-                <Button color="success" className="ml-3" onClick={this.jogging_filter}>Filter</Button>
-                <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.toggle_joggadd}>
-                  <i className="fa fa-plus" title="Add"></i>
-                </Button>
-              </Col>
-              <Col sm="12">
-                <Table bordered>
-                  <thead>
-                    <tr >
-                      <th>No</th>
-                      <th>Distance(km)</th>
-                      <th>StartDate</th>
-                      <th>EndDate</th>
-                      <th>Avg Speed(km/h)</th>
-                      <th>View</th>
-                      <th>Edit</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  { jogging && jogging.map((url, index) => {
-                      return(
-                        <tr key={index}>
-                          <th width="5%">{index+1}</th>
-                          <td width="15%">{url.distance}</td>
-                          <td width="22%">{this.convertDate(url.startdate)}</td>
-                          <td width="22%">{this.convertDate(url.enddate)}</td>
-                          <td width="15%">{Math.round(url.distance/url.diff_time)}</td>
-                          <td width="7%"><i className="fa fa-eye fa-lg i" onClick={() => {this.jogging_view_set(url._id)}}></i></td>
-                          <td width="7%"><i className="fa fa-pencil-square-o fa-lg i" onClick={() => {this.jogging_update_set(url._id, url)}}></i></td>
-                          <td width="7%"><i className="fa fa-trash fa-lg i" onClick={() => {this.jogging_delete_set(url._id)}}></i></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </Table>
-                { jogging && jogging.map((url, index) => { 
-                  if(url._id === this.state.jogging_view_id && this.state.jogging_view ){
-                    return(
-                      <Modal isOpen={this.state.jogging_view} toggle={this.jogging_view} className="modal-dialog1"  key={index}> 
-                        <ModalHeader toggle={this.jogging_view} >Jogging Data View</ModalHeader>
+              }
+              { userdata && userdata.role === "admin" && 
+                <Row>
+                  <Col sm="12">
+                    <Label className="font-40 font-bule">User and Jogging Data</Label>
+                  </Col>
+                </Row>
+              }
+              { userdata && userdata.role === "manager" && 
+                <div>
+                  <Row>
+                    <Col sm="12">
+                      <Label className="font-40 font-bule">User Data</Label>
+                    </Col>
+                  </Row>
+                  <Row className="mr-1 ml-1">
+                    <Col sm="12">
+                      <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.toggle_joggadd}>
+                        <i className="fa fa-plus" title="Add"></i>
+                      </Button>
+                    </Col>
+                    <Col sm="12">
+                      <Table bordered >
+                        <thead>
+                          <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Picture</th>
+                            <th width="20%">Name</th>
+                            <th width="20%">Email Address</th>
+                            <th width="8%">Activity</th>
+                            <th width="10%">Provider</th>
+                            <th width="6%">Edit</th>
+                            <th width="6%">Del</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        { users && users.map((url, index) => {
+                            return(
+                              <tr key={index} >
+                                <th className="table-vartical">{index+1}</th>
+                                <td width="22%">
+                                  <Card className="p-2 card-image" >
+                                    <img src={url.picture} className="usertable-image user-image"/>
+                                  </Card>
+                                </td>
+                                <td className="table-vartical">{url.name}</td>
+                                <td className="table-vartical">{url.email}</td>
+                                <td className="table-vartical">{url.activity ===1 ? <input type="checkbox" checked/>:<input type="checkbox"/>}</td>
+                                <td className="table-vartical">{url.provider}</td>
+                                <td className="table-vartical"><i className="fa fa-pencil-square-o fa-lg i" onClick={() => {this.user_update_set(url._id, url)}}></i></td>
+                                <td className="table-vartical"><i className="fa fa-trash fa-lg i" onClick={() => {this.user_delete_set(url._id)}}></i></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                    </Col>
+                  </Row>
+                </div>
+              }
+              { users && users.role === "user" && 
+                <div> 
+                  <Row>
+                    <Col sm="12">
+                      <Label className="font-40 font-bule">Jogging Data</Label>
+                    </Col>
+                  </Row>
+                  <Row className="mr-1 ml-1">
+                    <Col sm="12">
+                      <Label className="font-20">From</Label>
+                      <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="enddate"/>
+                      <Label className="font-20">To</Label>
+                      <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
+                      <Button color="success" className="ml-3" onClick={this.jogging_filter}>Filter</Button>
+                      <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.toggle_joggadd}>
+                        <i className="fa fa-plus" title="Add"></i>
+                      </Button>
+                    </Col>
+                    <Col sm="12">
+                      <Table bordered>
+                        <thead>
+                          <tr >
+                            <th width="5%">No</th>
+                            <th width="15%">Distance(km)</th>
+                            <th width="22%">StartDate</th>
+                            <th width="22%">EndDate</th>
+                            <th width="15%">Avg Speed(km/h)</th>
+                            <th width="7%">View</th>
+                            <th width="7%">Edit</th>
+                            <th width="7%">Delete</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        { jogging && jogging.map((url, index) => {
+                            return(
+                              <tr key={index}>
+                                <th>{index+1}</th>
+                                <td>{url.distance}</td>
+                                <td>{this.convertDate(url.startdate)}</td>
+                                <td>{this.convertDate(url.enddate)}</td>
+                                <td>{Math.round(url.distance/url.diff_time)}</td>
+                                <td><i className="fa fa-eye fa-lg i" onClick={() => {this.jogging_view_set(url._id)}}></i></td>
+                                <td><i className="fa fa-pencil-square-o fa-lg i" onClick={() => {this.jogging_update_set(url._id, url)}}></i></td>
+                                <td><i className="fa fa-trash fa-lg i" onClick={() => {this.jogging_delete_set(url._id)}}></i></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                      { jogging && jogging.map((url, index) => { 
+                        if(url._id === this.state.jogging_view_id && this.state.jogging_view ){
+                          return(
+                            <Modal isOpen={this.state.jogging_view} toggle={this.jogging_view} className="modal-dialog1"  key={index}> 
+                              <ModalHeader toggle={this.jogging_view} >Jogging Data View</ModalHeader>
+                                <ModalBody>
+                                  <Row> 
+                                    <Col sm="12" className="mb-2">
+                                      <Label className="font-20">Distance(km)</Label>
+                                      <Input type="number" name="distance" value = {url.distance} readOnly/>
+                                    </Col>
+                                  </Row>
+                                  <Row className="mb-2">
+                                    <Col sm="6">
+                                      <Label className="font-20">StartDate</Label>
+                                      <Input value={this.convertDate(url.startdate)} name="startdate" readOnly/>
+                                    </Col>
+                                    <Col sm="6">
+                                      <Label className="font-20">EndDate</Label>
+                                      <Input  value={this.convertDate(url.enddate)} name="enddate" readOnly/>
+                                    </Col>
+                                  </Row>
+                                  <Row> 
+                                    <Col sm="12" className="mb-2">
+                                      <Label className="font-20">Avg Speed(km/h)</Label>
+                                      <Input type="number" name="distance" value = {Math.round(url.distance/url.diff_time)} readOnly/>
+                                    </Col>
+                                  </Row>
+                                  <Row className="mt-3">
+                                    <Col sm="12">
+                                      <Label className="font-20">Commit</Label>
+                                      <Input type="textarea" value={url.commit} name="commit" readOnly/>
+                                    </Col>
+                                  </Row>
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button color="primary" onClick={this.jogging_view}>OK</Button>
+                                </ModalFooter>
+                            </Modal>
+                          );
+                        }
+                        if(url._id === this.state.jogging_update_id && this.state.jogging_update ){
+                          return(
+                            <Modal isOpen={this.state.jogging_update} toggle={this.jogging_update} className="modal-dialog1"  key={index}> 
+                              <ModalHeader toggle={this.jogging_update} >Jogging Data View</ModalHeader>
+                                <form onSubmit={e => { e.preventDefault();}}>
+                                  <ModalBody>
+                                    <Row> 
+                                      <Col sm="12" className="mb-2">
+                                        <Input type="number" step="any" name="distance" value = {this.state.distance} onChange={this.changeDistanceHandler} placeholder="Distance(km)" required/>
+                                      </Col>
+                                    </Row>
+                                    <Row className="mb-2">
+                                      <Col sm="6">
+                                        <Label className="font-20">StartDate</Label>
+                                        <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="startdate"/>
+                                      </Col>
+                                      <Col sm="6">
+                                      <Label className="font-20">EndDate</Label>
+                                        <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
+                                      </Col>
+                                    </Row> 
+                                    <Row className="mt-3">
+                                      <Col sm="12" className="text-center">
+                                        <Input type="textarea" value={this.state.commit} onChange={this.changeCommitHandler} name="commit" placeholder="Commit"/>
+                                      </Col>
+                                    </Row> 
+                                  </ModalBody>
+                                  <ModalFooter>
+                                    <Button color="primary" onClick={this.handlejoggingUpdate}>Save</Button>
+                                    <Button color="secondary" onClick={this.jogging_update}>Cancel</Button>
+                                  </ModalFooter>  
+                                </form>
+                            </Modal>
+                          );
+                        }
+                      })}
+                      <Modal isOpen={this.state.joggadd} toggle={this.toggle_joggadd} className="modal-dialog1">
+                      <ModalHeader toggle={this.toggle_joggadd}>Jogging Data Add</ModalHeader>
+                        <form onSubmit={e => { e.preventDefault();}}>
                           <ModalBody>
                             <Row> 
                               <Col sm="12" className="mb-2">
-                                <Label className="font-20">Distance(km)</Label>
-                                <Input type="number" name="distance" value = {url.distance} readOnly/>
+                                <Input type="number" step="any" name="distance" value = {this.state.distance} onChange={this.changeDistanceHandler} placeholder="Distance(km)" required/>
                               </Col>
                             </Row>
                             <Row className="mb-2">
                               <Col sm="6">
                                 <Label className="font-20">StartDate</Label>
-                                <Input value={this.convertDate(url.startdate)} name="startdate" readOnly/>
+                                <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="startdate"/>
                               </Col>
                               <Col sm="6">
-                                <Label className="font-20">EndDate</Label>
-                                <Input  value={this.convertDate(url.enddate)} name="enddate" readOnly/>
+                              <Label className="font-20">EndDate</Label>
+                                <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
                               </Col>
-                            </Row>
-                            <Row> 
-                              <Col sm="12" className="mb-2">
-                                <Label className="font-20">Avg Speed(km/h)</Label>
-                                <Input type="number" name="distance" value = {Math.round(url.distance/url.diff_time)} readOnly/>
-                              </Col>
-                            </Row>
+                            </Row> 
                             <Row className="mt-3">
-                              <Col sm="12">
-                                <Label className="font-20">Commit</Label>
-                                <Input type="textarea" value={url.commit} name="commit" readOnly/>
+                              <Col sm="12" className="text-center">
+                                <Input type="textarea" value={this.state.commit} onChange={this.changeCommitHandler} name="commit" placeholder="Commit"/>
                               </Col>
-                            </Row>
+                            </Row> 
+                          
                           </ModalBody>
                           <ModalFooter>
-                            <Button color="primary" onClick={this.jogging_view}>OK</Button>
+                            <Button color="primary" onClick={this.handlejoggingSubmit}>Save</Button>
+                            <Button color="secondary" onClick={this.toggle_joggadd}>Cancel</Button>
                           </ModalFooter>
+                        </form>
                       </Modal>
-                    );
-                  }
-                  if(url._id === this.state.jogging_update_id && this.state.jogging_update ){
-                    return(
-                      <Modal isOpen={this.state.jogging_update} toggle={this.jogging_update} className="modal-dialog1"  key={index}> 
-                        <ModalHeader toggle={this.jogging_update} >Jogging Data View</ModalHeader>
-                          <form onSubmit={e => { e.preventDefault();}}>
-                            <ModalBody>
-                              <Row> 
-                                <Col sm="12" className="mb-2">
-                                  <Input type="number" step="any" name="distance" value = {this.state.distance} onChange={this.changeDistanceHandler} placeholder="Distance(km)" required/>
-                                </Col>
-                              </Row>
-                              <Row className="mb-2">
-                                <Col sm="6">
-                                  <Label className="font-20">StartDate</Label>
-                                  <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="startdate"/>
-                                </Col>
-                                <Col sm="6">
-                                <Label className="font-20">EndDate</Label>
-                                  <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
-                                </Col>
-                              </Row> 
-                              <Row className="mt-3">
-                                <Col sm="12" className="text-center">
-                                  <Input type="textarea" value={this.state.commit} onChange={this.changeCommitHandler} name="commit" placeholder="Commit"/>
-                                </Col>
-                              </Row> 
-                            </ModalBody>
-                            <ModalFooter>
-                              <Button color="primary" onClick={this.handlejoggingUpdate}>Save</Button>
-                              <Button color="secondary" onClick={this.jogging_update}>Cancel</Button>
-                            </ModalFooter>  
-                          </form>
-                      </Modal>
-                    );
-                  }
-                })}
-              <Modal isOpen={this.state.joggadd} toggle={this.toggle_joggadd} className="modal-dialog1">
-                <ModalHeader toggle={this.toggle_joggadd}>Jogging Data Add</ModalHeader>
-                  <form onSubmit={e => { e.preventDefault();}}>
-                    <ModalBody>
-                      <Row> 
-                        <Col sm="12" className="mb-2">
-                          <Input type="number" step="any" name="distance" value = {this.state.distance} onChange={this.changeDistanceHandler} placeholder="Distance(km)" required/>
-                        </Col>
-                      </Row>
-                      <Row className="mb-2">
-                        <Col sm="6">
-                          <Label className="font-20">StartDate</Label>
-                          <DateTimePicker onChange={this.onChangeDate1} value={this.state.startdate} name="startdate"/>
-                        </Col>
-                        <Col sm="6">
-                        <Label className="font-20">EndDate</Label>
-                          <DateTimePicker onChange={this.onChangeDate2} value={this.state.enddate} name="enddate"/>
-                        </Col>
-                      </Row> 
-                      <Row className="mt-3">
-                        <Col sm="12" className="text-center">
-                          <Input type="textarea" value={this.state.commit} onChange={this.changeCommitHandler} name="commit" placeholder="Commit"/>
-                        </Col>
-                      </Row> 
-                    
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button color="primary" onClick={this.handlejoggingSubmit}>Save</Button>
-                      <Button color="secondary" onClick={this.toggle_joggadd}>Cancel</Button>
-                    </ModalFooter>
-                  </form>
-                </Modal>
-              </Col>
-              
-            </Row>
+                    </Col>
+                  </Row>
+                </div>
+              }
           </div>
         </Container>
       </div>

@@ -27,7 +27,7 @@ function* usersearch(email){
         const message = email.email + " isn't exist!";
         yield put(searchError(message));
       }
-      yield put(searchSuccess(respone.data.user, respone.data.jogging));
+      yield put(searchSuccess(respone.data.user, respone.data.jogging, respone.data.users));
     } catch (err) {
         const message = email.email +" isn't exist!";
         yield put(searchError(message));

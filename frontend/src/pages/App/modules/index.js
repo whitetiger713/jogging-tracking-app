@@ -8,6 +8,7 @@ const initialState = {
   userdata: null,
   errors: null,
   jogging:null,
+  users:null,
 };
 
 const app = (state = initialState, action) => {
@@ -16,7 +17,7 @@ const app = (state = initialState, action) => {
       return { ...state, loading: true };
 
     case SEARCH_SUCCESS:
-      return { ...state, loading: false, userdata: action.userdata, jogging:action.jogging };
+      return { ...state, loading: false, userdata: action.userdata, jogging:action.jogging, users:action.users };
 
     case SEARCH_ERROR:
       return { ...state, loading: false, errors: action.errors };

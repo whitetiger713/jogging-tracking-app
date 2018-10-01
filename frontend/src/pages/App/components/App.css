@@ -69,7 +69,10 @@
 .profile-pic:hover .edit {
 	display: block;
 }
-
+.usertable-image {
+  width: 80%;
+  height: 80%;
+}
 .edit {
   color: #37A000;
 	padding-right: 7px;
@@ -98,4 +101,10 @@ input[type="file"] {
 }
 .modal-dialog1{
   max-width: 600px !important;
+}
+.table-vartical{
+  vertical-align: middle !important;
+}
+.card-image{
+  display: block !important;
 }
