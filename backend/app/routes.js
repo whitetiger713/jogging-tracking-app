@@ -3,60 +3,11 @@ var Jogging = require('./models/jogging');
 var bcrypt = require('bcrypt');
 var https = require('https');
 var crypto = require('crypto');
-var passport = require('passport');
+var passport = require('./passport');
 var { generateToken, sendToken } = require('./utils/token.utils');
 var config = require('../config/auth');
-// var smtpTransport = nodemailer.createTransport({
-//     service: "Gmail",
-//     auth: {
-//         user: "",
-//         pass: ""
-//     }
-// });
-// https://nodemailer.com/about/
-var rand,mailOptions,host,link;
 
-var GoogleTokenStrategy = require('passport-google-token').Strategy;
-
-passport.use(new GoogleTokenStrategy({
-	clientID: config.googleAuth.clientID,
-	clientSecret: config.googleAuth.clientSecret
-	},
-	function (accessToken, refreshToken, profile, done) {
-			var email = profile.id;
-			var provider = profile.provider;
-			var name = profile.displayName;
-			var picutre = profile._json.picture;
-			User.findOne({
-				email: email
-			}, function (err, result) {
-				if (!result) {
-					var newUser = new User({
-						name: name,
-						email: email,
-						picture: picutre,
-						provider: provider,
-						activity: 1
-					});
-					User.createUser(newUser, function (err, user) {		
-						return done(err, user);
-					});
-				}
-				else{
-					return done(err,result);
-				}
-
-			});
-	}
-));
-function getUsers() {
-	User.find(function (err, users) {
-			if (err) {
-				return err;
-			}
-			return users;
-	});
-};
+var rand,host;
 
 module.exports = function (app) {
 		// register users
@@ -81,27 +32,14 @@ module.exports = function (app) {
 							host = req.get('host');
 							link="http://"+req.get('host')+"/user/verify?id="+rand;
 							console.log(rand);
-							// mailOptions={
-							// 	to : req.query.to,
-							// 	subject : "Please confirm your Email account",
-							// 	html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>"	
-							// }
-							// smtpTransport.sendMail(mailOptions, function(error, response){
-							// 	if(error) {
-							// 		console.log(error);
-							// 		res.end("error");
-							// 	}
-							// 	else {
-							// 		console.log("Message sent: " + response.message);
-							// 		res.end("sent");
-							// 	}
-							// });
-							var picture = "http://localhost:8080/user_images/avatar.png"
+							
+							var picture = "http://localhost:8080/user_images/avatar.png";
 							var newUser = new User({
 								name: req.body.name,
 								email: req.body.email,
 								password: req.body.password,
-								picture: picture
+								picture: picture,
+								role: 'user'
 							});
 							User.createUser(newUser, function (err, user) {		
 								if (err) {
@@ -131,53 +69,53 @@ module.exports = function (app) {
 			}
 		});
 	});
-	app.post('/user/resetpass', function (req, res) {
-		User.findOne({
-			email: req.body.email
-		}, function (err, result) {
-			if (result) {
-				var email = req.body.email;
-				var newpass = req.body.newpass;
-				var userpassword = result.password;
-				var password = req.body.curpass;
-				User.comparePassword(password, userpassword, function (err, isMatch) {
-					if (err) throw err;
-					if (isMatch) {
-						bcrypt.genSalt(10, function (err, salt) {
-							bcrypt.hash(newpass, salt, function (err, hash) {
-								newpass = hash;
-								User.updateOne({
-									email: email
-								}, {
-									password: newpass
-								}, function (err, result) {
-									if (err) {
-										res.send(err);
-									} else {
-										res.send({
-											'state': 1,
-											'message': "Reset Password!"
-										});
-									}
-								});
-							});
-						});
-					} else {
-						res.send({
-							'state': 0,
-							'message': "Current Password isn't correct!"
-						});
-					}
-				});
+	// app.post('/user/resetpass', function (req, res) {
+	// 	User.findOne({
+	// 		email: req.body.email
+	// 	}, function (err, result) {
+	// 		if (result) {
+	// 			var email = req.body.email;
+	// 			var newpass = req.body.newpass;
+	// 			var userpassword = result.password;
+	// 			var password = req.body.curpass;
+	// 			User.comparePassword(password, userpassword, function (err, isMatch) {
+	// 				if (err) throw err;
+	// 				if (isMatch) {
+	// 					bcrypt.genSalt(10, function (err, salt) {
+	// 						bcrypt.hash(newpass, salt, function (err, hash) {
+	// 							newpass = hash;
+	// 							User.updateOne({
+	// 								email: email
+	// 							}, {
+	// 								password: newpass
+	// 							}, function (err, result) {
+	// 								if (err) {
+	// 									res.send(err);
+	// 								} else {
+	// 									res.send({
+	// 										'state': 1,
+	// 										'message': "Reset Password!"
+	// 									});
+	// 								}
+	// 							});
+	// 						});
+	// 					});
+	// 				} else {
+	// 					res.send({
+	// 						'state': 0,
+	// 						'message': "Current Password isn't correct!"
+	// 					});
+	// 				}
+	// 			});
 
-			} else {
-				res.send({
-					'state': 0,
-					'message': "unregistered User!"
-				});
-			}
-		});
-	});
+	// 		} else {
+	// 			res.send({
+	// 				'state': 0,
+	// 				'message': "unregistered User!"
+	// 			});
+	// 		}
+	// 	});
+	// });
 	//check user in login
 	app.post('/user/login', function (req, res) {
 		User.findOne({
@@ -219,7 +157,57 @@ module.exports = function (app) {
 			}
 		});
 	});
-
+	app.post('/user/update', function (req, res) {
+		console.log(req.body.userdata)
+		var data = req.body.userdata;
+		User.updateOne({
+			email: data.email,
+		}, {
+			name: data.name,
+			email: data.email
+		}, function (err, result) {
+			if (!result) {
+				res.send(err);
+			} else {
+				res.send({
+					'state': 1,
+					'message': "Successfully updated"
+				});
+			}
+		});
+	});
+	app.post('/user/add', function (req, res) {
+		User.findOne({
+			email: req.body.email
+		}, function (err, result) {
+			if (!result) {
+				var picture = "http://localhost:8080/user_images/avatar.png"
+				var newUser = new User({
+					name: req.body.name,
+					email: req.body.email,
+					password: req.body.password,
+					picture: picture,
+					activity:1
+				});
+				User.createUser(newUser, function (err, user) {		
+					if (err) {
+						res.send(err);
+					} else {
+						res.send({
+							'email': req.body.email,
+							'state': 1,
+							'message': "Your account has been successfully created!"
+						});
+					}
+				});
+			} else {
+				res.send({
+					'state': 0,
+					'message': "This email is existing Email!"
+				});
+			}
+		});
+	});
 	app.post('/user/fileupload', (req, res, next) => {
 		let imageFile = req.files.file;
 		var filename =  crypto.randomBytes(15).toString('hex');
@@ -240,8 +228,24 @@ module.exports = function (app) {
 		});
 	
 	});
-
-	//check user in login
+	app.post('/user/delete', function (req, res) {
+		User.remove({
+			_id: req.body.id
+		}, function (err, user) {
+			if (!user){
+				res.send({
+					'state': 0,
+					'message': "Error"
+				});
+			}
+			else {
+				res.send({
+					'state': 1,
+					'message': "Successfully Deleted"
+				});
+			}
+		})
+	});
 	
 	app.get('/user/verify',function(req,res){
 		if((req.protocol+"://"+req.get('host')) === ("http://"+host)){
@@ -277,7 +281,7 @@ module.exports = function (app) {
 	});
 
 	app.post('/user/google', passport.authenticate('google-token', {session: false}), function(req, res, next) {
-		
+		// console.log("user : ",req.user, ", token : " ,req.body.access_token);
 		if (!req.user) {
 				return res.send(401, 'User Not Authenticated');
 		}
