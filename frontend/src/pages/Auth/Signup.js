@@ -32,9 +32,12 @@ class Signup extends React.Component {
       })
       .then(function (response) {
         if(response.data.state === 1){
-          // toast.success(response.data.message);
+          
+          toast.success(response.data.message);
           sessionStorage.setItem('verifyemail', response.data.email);
-          that.logSuccess();
+          setTimeout(function () {
+            that.logSuccess();
+          }, 1000);
         }
         if(response.data.state === 0){
           toast.error(response.data.message);

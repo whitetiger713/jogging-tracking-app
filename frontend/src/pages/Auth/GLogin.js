@@ -1,12 +1,16 @@
 import React from 'react';
-import { GoogleLogin } from 'react-google-login-component';
+import { GoogleLogin } from 'react-google-login';
 class GLogin extends React.Component{
   googlesucess = () => {
     this.props.state.history.push('/app');
     window.location.reload();
   }
+  onFailure = (response) => {
+    console.log(response);
+  }
   responseGoogle = (response) => {
-    const tokenBlob = new Blob([JSON.stringify({access_token: response.getAuthResponse().access_token}, null, 2)], {type : 'application/json'});
+    console.log(response)
+    const tokenBlob = new Blob([JSON.stringify({access_token: response.accessToken}, null, 2)], {type : 'application/json'});
     const options = {
         method: 'POST',
         body: tokenBlob,
@@ -28,11 +32,10 @@ class GLogin extends React.Component{
   render () {
     return (
       <div>
-        <GoogleLogin socialId="777279299686-k2ntn2dumtp6vcfirg0chp8j1pig2umd.apps.googleusercontent.com"
+        <GoogleLogin clientId="777279299686-ftipub6tv7fcpqj208kggna4r8m56rrn.apps.googleusercontent.com"
                      className="google-login"
-                     scope="profile"
                      fetchBasicProfile={false}
-                     responseHandler={this.responseGoogle}
+                     onSuccess = {this.responseGoogle}
         >
           <a className="googleplus ">
             <img src="/images/gp.png " title="googleplus " alt="googleplus "/>
@@ -41,6 +44,5 @@ class GLogin extends React.Component{
       </div>
     );
   }
- 
  }
  export default GLogin;

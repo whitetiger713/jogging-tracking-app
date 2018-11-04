@@ -21,10 +21,16 @@ class App extends Component {
       enddate:new Date(),
       distance: '',
       commit: '',
+      username: '',
+      email: '',
+      role: '',
       jogging_view: false,
       jogging_view_id: '',
       jogging_update: false,
       jogging_update_id: '',
+      user_update: false,
+      user_update_id: '',
+      user_add:false
     };
 
     this.toggle = this.toggle.bind(this);
@@ -33,10 +39,15 @@ class App extends Component {
     this.handleUploadImage = this.handleUploadImage.bind(this);
     this.jogging_view = this.jogging_view.bind(this);
     this.jogging_update = this.jogging_update.bind(this);
+    this.user_update = this.user_update.bind(this);
+    this.user_add = this.user_add.bind(this);
     this.changeDistanceHandler = this.changeDistanceHandler.bind(this);
     this.changeCommitHandler = this.changeCommitHandler.bind(this);
     this.jogging_filter = this.jogging_filter.bind(this);
-    
+    this.changeNameHandler = this.changeNameHandler.bind(this);
+    this.changeEmailHandler = this.changeEmailHandler.bind(this);
+    this.changeRoleHandler = this.changeRoleHandler.bind(this);
+    this.user_role_set = this.user_role_set.bind(this);
   }
   onChangeDate1 = startdate => this.setState({ startdate })
  
@@ -149,6 +160,18 @@ class App extends Component {
       });
     }    
   }
+  changeNameHandler(e) {
+    var value = e.target.value;
+    this.setState({ username: value });
+  }
+  changeEmailHandler(e) {
+    var value = e.target.value;
+    this.setState({ email: value });
+  }
+  changeRoleHandler(e) {
+    var value = e.target.value;
+    this.setState({ role: value });
+  }
   jogging_view(){
     this.setState({
       jogging_view: !this.state.jogging_view,
@@ -173,6 +196,21 @@ class App extends Component {
       startdate: new Date(data.startdate),
       enddate: new Date(data.enddate),
       commit: data.commit
+    });
+  }
+  user_update(){
+    this.setState({
+      user_update: !this.state.user_update,
+    });
+  }
+  user_update_set(id,data){
+    this.setState({
+      user_update: !this.state.user_update,
+      user_update_id: id,
+      picture: data.picture,
+      activity: data.activity,
+      username: data.name,
+      email: data.email
     });
   }
   handlejoggingUpdate = (ev) =>  {  
@@ -256,6 +294,109 @@ class App extends Component {
       }
     })
   }
+  handleUserUpdate = (ev) =>  {  
+    ev.preventDefault();
+    var that = this;
+    var userdata = {
+      "name": this.state.username,
+      "email": this.state.email,
+    }
+    axios.post('http://localhost:8080/user/update', {
+      userdata
+    })
+    .then(function (response) {
+      if(response.data.state === 1){
+        toast.success(response.data.message);
+        that.user_update();
+        setTimeout(function () {
+          that.success_update();
+        }, 1000);
+      }
+      if(response.data.state === 0){
+        toast.error(response.data.message);
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });  
+  }
+  user_delete_set(id){
+    var that = this;
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className='custom-ui shadow-box p-4 mt-5'>
+            <h5>Confirm Alert</h5>
+            <h2 >You want to delete this User?</h2>
+            <div className="mt-4 text-right">
+              <Button size="sm" onClick={onClose} className="mr-2">No</Button>
+              <Button color="primary" size="sm" onClick={() => {
+                axios.post('http://localhost:8080/user/delete', {
+                  id
+                })
+                .then(function (response) {
+                  if(response.data.state === 1){
+                    toast.success(response.data.message);
+                    that.jogging_update();
+                    setTimeout(function () {
+                      that.success_update();
+                    }, 1000);
+                  }
+                  if(response.data.state === 0){
+                    toast.error(response.data.message);
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+                onClose()
+              }}>Yes</Button>
+            </div>
+          </div>
+        )
+      }
+    })
+  }
+  user_add() {
+    this.setState({
+      user_add: !this.state.user_add
+    });
+  }
+  user_role_set(value){
+    this.setState({
+      role: value
+    });
+  }
+  userForm = (e) => {
+    console.log(this.refs.name.value)
+    const that = this;
+    e.preventDefault();
+    if (this.refs.password1.value === this.refs.password2.value){
+      axios.post('http://localhost:8080/user/add', {
+        email: this.refs.email.value,
+        password: this.refs.password1.value,
+        name: this.refs.name.value,
+      })
+      .then(function (response) {
+        if(response.data.state === 1){
+          
+          toast.success(response.data.message);
+          setTimeout(function () {
+            that.success_update();
+          }, 1000);
+        }
+        if(response.data.state === 0){
+          toast.error(response.data.message);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
+    else{
+        toast.error("Password isn't March! Please input again.");
+    }
+  }
   jogging_filter(){
     var startdate = this.state.startdate;
     var enddate = this.state.enddate;
@@ -335,22 +476,15 @@ class App extends Component {
                 </Row>
               }
               { userdata && userdata.role === "admin" && 
-                <Row>
-                  <Col sm="12">
-                    <Label className="font-40 font-bule">User and Jogging Data</Label>
-                  </Col>
-                </Row>
-              }
-              { userdata && userdata.role === "manager" && 
                 <div>
                   <Row>
                     <Col sm="12">
-                      <Label className="font-40 font-bule">User Data</Label>
+                      <Label className="font-40 font-bule">User and Jogging Data</Label>
                     </Col>
                   </Row>
                   <Row className="mr-1 ml-1">
                     <Col sm="12">
-                      <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.toggle_joggadd}>
+                      <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.user_add}>
                         <i className="fa fa-plus" title="Add"></i>
                       </Button>
                     </Col>
@@ -363,25 +497,25 @@ class App extends Component {
                             <th width="20%">Name</th>
                             <th width="20%">Email Address</th>
                             <th width="8%">Activity</th>
-                            <th width="10%">Provider</th>
+                            <th width="10%">Role</th>
                             <th width="6%">Edit</th>
                             <th width="6%">Del</th>
                           </tr>
                         </thead>
                         <tbody>
-                        { users && users.map((url, index) => {
+                        { users && users.map((url, index)  => {
                             return(
                               <tr key={index} >
                                 <th className="table-vartical">{index+1}</th>
                                 <td width="22%">
                                   <Card className="p-2 card-image" >
-                                    <img src={url.picture} className="usertable-image user-image"/>
+                                    <img src={url.picture} className="usertable-image user-image" alt="avatar"/>
                                   </Card>
                                 </td>
                                 <td className="table-vartical">{url.name}</td>
                                 <td className="table-vartical">{url.email}</td>
-                                <td className="table-vartical">{url.activity ===1 ? <input type="checkbox" checked/>:<input type="checkbox"/>}</td>
-                                <td className="table-vartical">{url.provider}</td>
+                                <td className="table-vartical">{url.activity ===1 ? <input type="checkbox" checked readOnly/>:<input type="checkbox" />}</td>
+                                <td className="table-vartical">{url.role}</td>
                                 <td className="table-vartical"><i className="fa fa-pencil-square-o fa-lg i" onClick={() => {this.user_update_set(url._id, url)}}></i></td>
                                 <td className="table-vartical"><i className="fa fa-trash fa-lg i" onClick={() => {this.user_delete_set(url._id)}}></i></td>
                               </tr>
@@ -389,11 +523,218 @@ class App extends Component {
                           })}
                         </tbody>
                       </Table>
+                      {users && users.map((url, index) => {
+                        if(url._id === this.state.user_update_id && this.state.user_update){
+                          this.user_role_set(url.role);
+
+                          return(
+                            <Modal isOpen={this.state.user_update} toggle={this.user_update} className="modal-dialog1"  key={index}> 
+                              <ModalHeader toggle={this.user_update} >User Data Update</ModalHeader>
+                                <ModalBody>
+                                  <Row> 
+                                    <Col sm="12" className="mb-2">
+                                      <Label className="font-20">Name</Label>
+                                      <Input type="text" name="name" value = {this.state.username} onChange={this.changeNameHandler} placeholder="Name" required/>
+                                    </Col>
+                                  </Row>
+                                  <Row className="mb-2">
+                                    <Col sm="12">
+                                      <Label className="font-20">Email Address</Label>
+                                      <Input  name="email" type="email" value={this.state.email} onChange={this.changeEmailHandler} placeholder="Email Address" required/>
+                                    </Col>
+                                  </Row>
+                                  <Row className="mb-2">
+                                    <Col sm="12">
+                                      <Label className="font-20">Role</Label>
+                                      <select className="form-control" value={this.state.role} onChange={this.changeRoleHandler}>
+                                        <option value="admin">admin</option>
+                                        <option value="manager">manager</option>
+                                        <option value="user">user</option>
+                                      </select>
+                                    </Col>
+                                  </Row>
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button color="primary" onClick={this.handleUserUpdate}>Save</Button>
+                                  <Button color="secondary" onClick={this.user_update}>Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+                          );}
+                        })
+                      }
                     </Col>
                   </Row>
-                </div>
+                  <Modal isOpen={this.state.user_add} toggle={this.user_add} className="modal-dialog1">
+                    <form onSubmit={ this.userForm }>
+                      <ModalHeader toggle={this.user_add} >User Data Update</ModalHeader>
+                      <ModalBody>
+                        <Row> 
+                          <Col sm="12" className="mb-2">
+                            <Label className="font-20">Name</Label>
+                            <input className="form-control" type="text" name="name" ref="name" placeholder="Name" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Email Address</Label>
+                            <input className="form-control" name="email" type="email" ref="email" placeholder="Email Address" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Password</Label>
+                            <input className="form-control"  name="password" type="password" ref="password1" placeholder="Password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*" title="Minimum 8 characters, one number, one uppercase and one lowercase letter" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Confirm Password</Label>
+                            <input className="form-control" name="password" ref="password2" type="password" placeholder="Confirm Password" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Role</Label>
+                            <Input type="text" value="Regular User" readOnly/>
+                          </Col>
+                        </Row>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button color="primary" type="submit" >Save</Button>
+                        <Button color="secondary" onClick={this.user_add} >Cancel</Button>
+                      </ModalFooter>
+                    </form>
+                  </Modal>
+                </div>                
               }
-              { users && users.role === "user" && 
+              { userdata && userdata.role === "manager" && 
+                <div>
+                  <Row>
+                    <Col sm="12">
+                      <Label className="font-40 font-bule">User Data</Label>
+                    </Col>
+                  </Row>
+                  <Row className="mr-1 ml-1">
+                    <Col sm="12">
+                      <Button color="primary" size="sm" className="pull-right mb-3" onClick={this.user_add}>
+                        <i className="fa fa-plus" title="Add"></i>
+                      </Button>
+                    </Col>
+                    <Col sm="12">
+                      <Table bordered >
+                        <thead>
+                          <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Picture</th>
+                            <th width="20%">Name</th>
+                            <th width="20%">Email Address</th>
+                            <th width="8%">Activity</th>
+                            <th width="10%">Role</th>
+                            <th width="6%">Edit</th>
+                            <th width="6%">Del</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        { users && users.map((url, index)  => {
+                           if(url.role === "user")
+                            return(
+                              <tr key={index} >
+                                <th className="table-vartical">{index+1}</th>
+                                <td width="22%">
+                                  <Card className="p-2 card-image" >
+                                    <img src={url.picture} className="usertable-image user-image" alt="avatar"/>
+                                  </Card>
+                                </td>
+                                <td className="table-vartical">{url.name}</td>
+                                <td className="table-vartical">{url.email}</td>
+                                <td className="table-vartical">{url.activity ===1 ? <input type="checkbox" checked readOnly/>:<input type="checkbox" />}</td>
+                                <td className="table-vartical">{url.role}</td>
+                                <td className="table-vartical"><i className="fa fa-pencil-square-o fa-lg i" onClick={() => {this.user_update_set(url._id, url)}}></i></td>
+                                <td className="table-vartical"><i className="fa fa-trash fa-lg i" onClick={() => {this.user_delete_set(url._id)}}></i></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                      { users && users.map((url, index) => {
+                        if(url._id === this.state.user_update_id && this.state.user_update){
+                          return(
+                            <Modal isOpen={this.state.user_update} toggle={this.user_update} className="modal-dialog1"  key={index}> 
+                              <ModalHeader toggle={this.user_update} >User Data Update</ModalHeader>
+                                <ModalBody>
+                                  <Row> 
+                                    <Col sm="12" className="mb-2">
+                                      <Label className="font-20">Name</Label>
+                                      <Input type="text" name="name" value = {this.state.username} onChange={this.changeNameHandler} placeholder="Name" required/>
+                                    </Col>
+                                  </Row>
+                                  <Row className="mb-2">
+                                    <Col sm="12">
+                                      <Label className="font-20">Email Address</Label>
+                                      <Input  name="email" type="email" value={this.state.email} onChange={this.changeEmailHandler} placeholder="Email Address" required/>
+                                    </Col>
+                                  </Row>
+                                  <Row className="mb-2">
+                                    <Col sm="12">
+                                      <Label className="font-20">Role</Label>
+                                      <Input  name="email" type="email" value="Regular User" readOnly/>
+                                    </Col>
+                                  </Row>
+                                </ModalBody>
+                                <ModalFooter>
+                                  <Button color="primary" onClick={this.handleUserUpdate}>Save</Button>
+                                  <Button color="secondary" onClick={this.user_update}>Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+                          );}
+                        })
+                      }
+                    </Col>
+                  </Row>
+                  <Modal isOpen={this.state.user_add} toggle={this.user_add} className="modal-dialog1">
+                    <form onSubmit={ this.userForm }>
+                      <ModalHeader toggle={this.user_add} >User Data Update</ModalHeader>
+                      <ModalBody>
+                        <Row> 
+                          <Col sm="12" className="mb-2">
+                            <Label className="font-20">Name</Label>
+                            <input className="form-control" type="text" name="name" ref="name" placeholder="Name" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Email Address</Label>
+                            <input className="form-control" name="email" type="email" ref="email" placeholder="Email Address" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Password</Label>
+                            <input className="form-control"  name="password" type="password" ref="password1" placeholder="Password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*" title="Minimum 8 characters, one number, one uppercase and one lowercase letter" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Confirm Password</Label>
+                            <input className="form-control" name="password" ref="password2" type="password" placeholder="Confirm Password" required/>
+                          </Col>
+                        </Row>
+                        <Row className="mb-2">
+                          <Col sm="12">
+                            <Label className="font-20">Role</Label>
+                            <Input type="text" value="Regular User" readOnly/>
+                          </Col>
+                        </Row>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button color="primary" type="submit" >Save</Button>
+                        <Button color="secondary" onClick={this.user_add} >Cancel</Button>
+                      </ModalFooter>
+                    </form>
+                  </Modal>
+                </div>
+              } 
+              { userdata && userdata.role === "user" && 
                 <div> 
                   <Row>
                     <Col sm="12">
