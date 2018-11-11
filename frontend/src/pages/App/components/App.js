@@ -210,7 +210,8 @@ class App extends Component {
       picture: data.picture,
       activity: data.activity,
       username: data.name,
-      email: data.email
+      email: data.email,
+      role: data.role
     });
   }
   handlejoggingUpdate = (ev) =>  {  
@@ -298,8 +299,10 @@ class App extends Component {
     ev.preventDefault();
     var that = this;
     var userdata = {
+      "id": this.state.user_update_id,
       "name": this.state.username,
       "email": this.state.email,
+      "role": this.state.role
     }
     axios.post('http://localhost:8080/user/update', {
       userdata
@@ -376,6 +379,7 @@ class App extends Component {
         email: this.refs.email.value,
         password: this.refs.password1.value,
         name: this.refs.name.value,
+        role: this.refs.role.value
       })
       .then(function (response) {
         if(response.data.state === 1){
@@ -525,8 +529,6 @@ class App extends Component {
                       </Table>
                       {users && users.map((url, index) => {
                         if(url._id === this.state.user_update_id && this.state.user_update){
-                          this.user_role_set(url.role);
-
                           return(
                             <Modal isOpen={this.state.user_update} toggle={this.user_update} className="modal-dialog1"  key={index}> 
                               <ModalHeader toggle={this.user_update} >User Data Update</ModalHeader>
@@ -595,7 +597,11 @@ class App extends Component {
                         <Row className="mb-2">
                           <Col sm="12">
                             <Label className="font-20">Role</Label>
-                            <Input type="text" value="Regular User" readOnly/>
+                            <select className="form-control" ref="role">
+                              <option value="admin">admin</option>
+                              <option value="manager">manager</option>
+                              <option value="user">user</option>
+                            </select>
                           </Col>
                         </Row>
                       </ModalBody>
@@ -722,7 +728,7 @@ class App extends Component {
                         <Row className="mb-2">
                           <Col sm="12">
                             <Label className="font-20">Role</Label>
-                            <Input type="text" value="Regular User" readOnly/>
+                            <Input type="text" value="user" ref="role" readOnly/>
                           </Col>
                         </Row>
                       </ModalBody>
