@@ -161,10 +161,11 @@ module.exports = function (app) {
 		console.log(req.body.userdata)
 		var data = req.body.userdata;
 		User.updateOne({
-			email: data.email,
+			_id: data.id,
 		}, {
 			name: data.name,
-			email: data.email
+			email: data.email,
+			role: data.role
 		}, function (err, result) {
 			if (!result) {
 				res.send(err);
@@ -187,6 +188,7 @@ module.exports = function (app) {
 					email: req.body.email,
 					password: req.body.password,
 					picture: picture,
+					role: req.body.role,
 					activity:1
 				});
 				User.createUser(newUser, function (err, user) {		
